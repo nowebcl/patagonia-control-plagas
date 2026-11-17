@@ -1,807 +1,1032 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Users,
-  Calendar,
-  FileText,
-  CreditCard,
-  Plus,
-  CheckCircle2,
   ArrowLeft,
-  Phone,
+  BarChart3,
+  Building2,
+  Camera,
+  Download,
+  ExternalLink,
+  FileText,
+  Lock,
   MapPin,
-  Printer,
-  TrendingUp,
-  Clock,
-  Menu,
-  X
+  MessageCircle,
+  Plus,
+  RefreshCw,
+  RotateCcw,
+  Save,
+  Settings,
+  Star,
+  Trash2,
+  Upload,
+  Wrench
 } from 'lucide-react';
-import { useDemoData } from '../context/DemoDataContext';
+import { DEFAULT_SITE_CONFIG } from '../data/siteConfig';
+import { useSiteContent } from '../context/SiteContentContext';
+import { loadLocalMetrics } from '../utils/analytics';
+import SeoHead from '../components/SeoHead';
 
-const formatCLP = (val) =>
-  new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(val || 0);
+const TABS = [
+  { id: 'empresa', label: 'Empresa y Enlaces', icon: Building2 },
+  { id: 'servicios', label: 'Servicios y Precios', icon: Wrench },
+  { id: 'galeria', label: 'Galería de Trabajos', icon: Camera },
+  { id: 'documentos', label: 'Documentos', icon: FileText },
+  { id: 'cobertura', label: 'Cobertura y Reseñas', icon: MapPin },
+  { id: 'metricas', label: 'Cotizaciones y Estadísticas', icon: BarChart3 },
+  { id: 'respaldo', label: 'Exportar / Importar JSON', icon: Settings }
+];
+
+const GALLERY_CATEGORIES = [
+  'Estaciones Cebaderas',
+  'Desratización',
+  'Desinsectación',
+  'Sanitización',
+  'Control de Aves',
+  'Control de Malezas',
+  'Pre-Demolición',
+  'Trabajos Industriales'
+];
 
 export default function AdminPage() {
   const {
-    clients,
-    appointments,
-    payments,
-    invoices,
-    addClient,
-    addInspectionRequest,
-    updateAppointmentStatus,
-    updatePaymentStatus,
-    createInvoiceAndPayment
-  } = useDemoData();
+    config,
+    updateCompany,
+    updateService,
+    addGalleryItem,
+    removeGalleryItem,
+    addReview,
+    removeReview,
+    addCoverageArea,
+    removeCoverageArea,
+    addDocumentItem,
+    updateDocumentItem,
+    removeDocumentItem,
+    quoteRequests,
+    importConfigJson,
+    resetConfigToDefault
+  } = useSiteContent();
 
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [modalType, setModalType] = useState(null); // 'agendar' | 'cliente' | 'factura'
-  const [previewInvoice, setPreviewInvoice] = useState(null);
+  const [unlocked, setUnlocked] = useState(false);
+  const [passInput, setPassInput] = useState('');
+  const [passError, setPassError] = useState('');
+  const [activeTab, setActiveTab] = useState('empresa');
+  const [saveToast, setSaveToast] = useState('');
 
-  const [quickForm, setQuickForm] = useState({
-    nombre: '',
-    rut: '76.543.210-K',
-    telefono: '+56 9 ',
-    direccion: '',
-    servicio: 'Desinsectación',
-    fecha: '2026-11-07',
-    hora: '10:30',
-    monto: 55000
+  // Company form state
+  const [companyForm, setCompanyForm] = useState(config.company);
+
+  // Gallery new item form
+  const [newPhoto, setNewPhoto] = useState({
+    title: '',
+    category: GALLERY_CATEGORIES[0],
+    location: 'Puerto Montt, Región de Los Lagos',
+    image: '',
+    caption: ''
   });
 
-  // Dashboard Metrics
-  const totalPagado = payments
-    .filter((p) => p.estado === 'Pagado')
-    .reduce((acc, p) => acc + Number(p.monto), 0);
+  // Coverage new item form
+  const [newArea, setNewArea] = useState({
+    name: '',
+    province: 'Llanquihue',
+    detail: '',
+    x: 50,
+    y: 55
+  });
 
-  const totalPorCobrar = payments
-    .filter((p) => p.estado !== 'Pagado')
-    .reduce((acc, p) => acc + Number(p.monto), 0);
+  // Review new item form
+  const [newReview, setNewReview] = useState({
+    author: '',
+    sector: 'Cliente Residencial · Puerto Montt',
+    rating: 5,
+    text: ''
+  });
 
-  const pendientesCount = appointments.filter((a) => a.estado !== 'Completado').length;
-  const completadosCount = appointments.filter((a) => a.estado === 'Completado').length;
-  const totalApps = Math.max(1, appointments.length);
+  // Document new item form
+  const [newDoc, setNewDoc] = useState({
+    title: '',
+    issuer: 'Emitido por Control de Plagas Patagonia Chile',
+    category: 'Documentación',
+    desc: '',
+    previewSummary: ''
+  });
 
-  // Service distribution
-  const desratCount = appointments.filter((a) => a.servicio === 'Desratización').length;
-  const desinsCount = appointments.filter((a) => a.servicio === 'Desinsectación').length;
-  const sanitCount = appointments.filter((a) => a.servicio === 'Sanitización').length;
+  const [importText, setImportText] = useState('');
+  const [metrics, setMetrics] = useState(() => loadLocalMetrics());
 
-  const handleQuickSubmit = (e) => {
-    e.preventDefault();
-    if (modalType === 'agendar') {
-      addInspectionRequest(quickForm);
-    } else if (modalType === 'cliente') {
-      addClient({
-        nombre: quickForm.nombre,
-        contacto: quickForm.nombre,
-        rut: quickForm.rut,
-        tipo: 'Empresa',
-        telefono: quickForm.telefono,
-        direccion: quickForm.direccion,
-        sector: 'Puerto Montt',
-        plan: quickForm.servicio
-      });
-    } else if (modalType === 'factura') {
-      const inv = createInvoiceAndPayment({
-        tipoDoc: 'Factura Electrónica',
-        clienteNombre: quickForm.nombre,
-        rut: quickForm.rut,
-        direccion: quickForm.direccion || 'Puerto Montt',
-        servicioDetalle: `Servicio ${quickForm.servicio}`,
-        neto: Number(quickForm.monto) || 55000,
-        estadoPago: 'Pagada'
-      });
-      setPreviewInvoice(inv);
-    }
-    setModalType(null);
-    setQuickForm({
-      nombre: '',
-      rut: '76.543.210-K',
-      telefono: '+56 9 ',
-      direccion: '',
-      servicio: 'Desinsectación',
-      fecha: '2026-11-07',
-      hora: '10:30',
-      monto: 55000
-    });
+  const showToast = (msg) => {
+    setSaveToast(msg);
+    setTimeout(() => setSaveToast(''), 3000);
   };
 
-  const SIDEBAR_ITEMS = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'agendamientos', label: 'Agendamientos', icon: Calendar, badge: pendientesCount },
-    { id: 'clientes', label: 'Clientes', icon: Users, badge: clients.length },
-    { id: 'pagos', label: 'Pagos', icon: CreditCard },
-    { id: 'facturas', label: 'Facturas SII', icon: FileText, badge: invoices.length }
-  ];
+  const handleUnlock = (e) => {
+    e.preventDefault();
+    if (passInput.trim() === (config.company.adminPasscode || 'patagonia2026')) {
+      setUnlocked(true);
+      setPassError('');
+      setCompanyForm(config.company);
+    } else {
+      setPassError('Clave incorrecta. Verifica tu contraseña de administración.');
+    }
+  };
+
+  const handleSaveCompany = (e) => {
+    e.preventDefault();
+    updateCompany(companyForm);
+    showToast('Datos de empresa y enlaces actualizados correctamente.');
+  };
+
+  const handleLocalImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxWidth = 900;
+        const scale = Math.min(1, maxWidth / img.width);
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        setNewPhoto((prev) => ({ ...prev, image: compressedDataUrl }));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddPhoto = (e) => {
+    e.preventDefault();
+    if (!newPhoto.title.trim() || !newPhoto.image.trim()) return;
+    addGalleryItem(newPhoto);
+    setNewPhoto({
+      title: '',
+      category: GALLERY_CATEGORIES[0],
+      location: 'Puerto Montt, Región de Los Lagos',
+      image: '',
+      caption: ''
+    });
+    showToast('Fotografía agregada a la galería.');
+  };
+
+  const handleAddArea = (e) => {
+    e.preventDefault();
+    if (!newArea.name.trim()) return;
+    addCoverageArea({
+      ...newArea,
+      x: Number(newArea.x) || 50,
+      y: Number(newArea.y) || 50,
+      primary: false
+    });
+    setNewArea({ name: '', province: 'Llanquihue', detail: '', x: 50, y: 55 });
+    showToast('Comuna o localidad agregada al mapa de cobertura.');
+  };
+
+  const handleAddReview = (e) => {
+    e.preventDefault();
+    if (!newReview.author.trim() || !newReview.text.trim()) return;
+    addReview({ ...newReview, rating: Number(newReview.rating) || 5 });
+    setNewReview({ author: '', sector: 'Cliente · Región de Los Lagos', rating: 5, text: '' });
+    showToast('Reseña publicada en el sitio.');
+  };
+
+  const handleAddDoc = (e) => {
+    e.preventDefault();
+    if (!newDoc.title.trim() || !newDoc.desc.trim()) return;
+    addDocumentItem(newDoc);
+    setNewDoc({
+      title: '',
+      issuer: 'Emitido por Control de Plagas Patagonia Chile',
+      category: 'Documentación',
+      desc: '',
+      previewSummary: ''
+    });
+    showToast('Documento técnico agregado.');
+  };
+
+  const handleDownloadJson = () => {
+    const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `patagonia-site-config-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportJson = () => {
+    try {
+      importConfigJson(importText);
+      setImportText('');
+      showToast('Configuración importada correctamente.');
+    } catch {
+      showToast('El texto JSON no tiene un formato válido.');
+    }
+  };
+
+  if (!unlocked) {
+    return (
+      <div className="min-h-screen bg-[#181818] text-white flex items-center justify-center p-4">
+        <SeoHead title={`Administración | ${config.company.brandName}`} path="/admin" noIndex />
+        <div className="bg-white text-neutral-900 rounded-[28px] max-w-md w-full p-7 space-y-5 shadow-2xl">
+          <div className="flex items-center justify-between">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#C41625]">
+              <Lock className="w-4 h-4" /> Panel de Administración
+            </span>
+            <Link to="/" className="text-xs font-semibold text-neutral-500 hover:text-neutral-900">
+              Volver al sitio
+            </Link>
+          </div>
+          <div>
+            <h1 className="font-editorial text-2xl font-bold">{config.company.brandName}</h1>
+            <p className="text-xs text-neutral-600 mt-1">
+              Ingresa tu clave para editar tarifas referenciales, galería de trabajos, enlace a Central MIP, Perfil de Google, Google Analytics y reseñas.
+            </p>
+          </div>
+          <form onSubmit={handleUnlock} className="space-y-3">
+            <input
+              type="password"
+              value={passInput}
+              onChange={(e) => setPassInput(e.target.value)}
+              placeholder="Contraseña de administrador"
+              className="w-full rounded-xl border border-neutral-300 px-3.5 py-2.5 text-sm focus:outline-none focus:border-[#C41625]"
+              autoFocus
+            />
+            {passError && <p className="text-xs text-[#C41625] font-medium">{passError}</p>}
+            <button
+              type="submit"
+              className="w-full bg-[#C41625] hover:bg-[#a6121f] text-white text-sm font-bold py-3 rounded-full transition cursor-pointer"
+            >
+              Ingresar al panel
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#F4F4F6] text-[#141414] flex">
-      {/* ================= LEFT SIDEBAR (Fixed on Desktop, Drawer + Rail on Mobile) ================= */}
-      <aside className="hidden md:flex md:w-64 bg-[#181818] text-white flex-col justify-between p-5 shrink-0 sticky top-0 h-screen shadow-xl">
-        <div>
-          {/* Logo Header */}
-          <div className="flex items-center justify-between pb-5 border-b border-white/10">
-            <Link to="/">
-              <img src="/logo-patagonia.png" alt="Patagonia" className="h-11 w-auto" />
-            </Link>
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-[#C41625] text-white px-2.5 py-0.5 rounded-full">
-              Admin
-            </span>
-          </div>
+    <div className="min-h-screen bg-neutral-100 text-neutral-900">
+      <SeoHead title={`Panel Admin | ${config.company.brandName}`} path="/admin" noIndex />
 
-          {/* Side Menu Options */}
-          <p className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold mt-6 mb-2.5 px-3">
-            Menú Principal
-          </p>
-          <nav className="space-y-1.5">
-            {SIDEBAR_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const active = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-semibold transition cursor-pointer ${
-                    active
-                      ? 'bg-[#C41625] text-white shadow-md'
-                      : 'text-neutral-400 hover:bg-white/8 hover:text-white'
-                  }`}
-                >
-                  <span className="flex items-center gap-3">
-                    <Icon className="w-4 h-4" />
-                    {item.label}
-                  </span>
-                  {item.badge !== undefined && (
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        active ? 'bg-white text-[#C41625]' : 'bg-white/10 text-neutral-300'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Bottom Sidebar Actions */}
-        <div className="pt-5 border-t border-white/10 space-y-2.5">
-          <button
-            onClick={() => setModalType('agendar')}
-            className="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-[#C41625] text-white text-xs font-semibold py-2.5 px-4 rounded-xl transition cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Nuevo Agendamiento</span>
-          </button>
-
-          <Link
-            to="/"
-            className="w-full flex items-center justify-center gap-2 bg-white text-[#181818] hover:bg-neutral-200 text-xs font-bold py-2.5 px-4 rounded-xl transition"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Volver a la Web</span>
-          </Link>
-        </div>
-      </aside>
-
-      {/* ================= MOBILE LEFT ICON RAIL (Clean Icon Dock on Mobile) ================= */}
-      <aside className="flex md:hidden w-14 bg-[#181818] text-white flex-col items-center justify-between py-4 shrink-0 sticky top-0 h-screen z-30 border-r border-white/10">
-        <div className="flex flex-col items-center gap-4">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="w-10 h-10 rounded-xl bg-white/10 text-white hover:bg-[#C41625] flex items-center justify-center transition cursor-pointer"
-            title="Expandir menú"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-
-          <nav className="flex flex-col items-center gap-2 mt-2">
-            {SIDEBAR_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const active = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveTab(item.id)}
-                  className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition cursor-pointer ${
-                    active ? 'bg-[#C41625] text-white shadow-md' : 'text-neutral-400 hover:text-white hover:bg-white/5'
-                  }`}
-                  title={item.label}
-                >
-                  <Icon className="w-5 h-5" />
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#C41625] text-white text-[9px] font-bold rounded-full flex items-center justify-center border-2 border-[#181818]">
-                      {item.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-
-        <Link
-          to="/"
-          className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition"
-          title="Volver a la Web"
-        >
-          <ArrowLeft className="w-4 h-4" />
-        </Link>
-      </aside>
-
-      {/* ================= MOBILE EXPANDABLE SIDEBAR DRAWER ================= */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex md:hidden">
-          <div className="w-64 bg-[#181818] text-white h-full p-5 flex flex-col justify-between shadow-2xl">
-            <div>
-              <div className="flex items-center justify-between pb-4 border-b border-white/10">
-                <img src="/logo-patagonia.png" alt="Patagonia" className="h-10 w-auto" />
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                  className="p-2 rounded-full bg-white/10 text-white"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <nav className="mt-5 space-y-1.5">
-                {SIDEBAR_ITEMS.map((item) => {
-                  const Icon = item.icon;
-                  const active = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        setSidebarOpen(false);
-                      }}
-                      className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl text-xs font-semibold transition ${
-                        active ? 'bg-[#C41625] text-white' : 'text-neutral-300 hover:bg-white/10'
-                      }`}
-                    >
-                      <span className="flex items-center gap-3">
-                        <Icon className="w-4 h-4" />
-                        {item.label}
-                      </span>
-                      {item.badge !== undefined && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/15">
-                          {item.badge}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </nav>
-            </div>
-
+      {/* Header */}
+      <header className="bg-[#181818] text-white px-4 sm:px-8 py-4 border-b border-white/10">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="w-full flex items-center justify-center gap-2 bg-white text-[#181818] text-xs font-bold py-3 rounded-xl"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-300 hover:text-white bg-white/10 px-3 py-1.5 rounded-full"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Volver a la Web</span>
+              <ArrowLeft className="w-3.5 h-3.5" /> Ver sitio web
             </Link>
+            <div>
+              <h1 className="font-bold text-sm sm:text-base">{config.company.brandName} — CMS</h1>
+              <p className="text-[11px] text-neutral-400">Gestión autónoma de precios, galería y configuraciones</p>
+            </div>
           </div>
-        </div>
-      )}
 
-      {/* ================= RIGHT DASHBOARD WORKSPACE ================= */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar inside Dashboard */}
-        <header className="bg-white border-b border-neutral-200/80 px-4 sm:px-8 py-4 flex items-center justify-between sticky top-0 z-20">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#C41625] block">
-              Patagonia Control de Plagas
+          {saveToast && (
+            <span className="bg-emerald-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow">
+              {saveToast}
             </span>
-            <h1 className="font-editorial text-xl sm:text-2xl font-bold text-neutral-900">
-              {SIDEBAR_ITEMS.find((i) => i.id === activeTab)?.label}
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() =>
-                setModalType(
-                  activeTab === 'clientes'
-                    ? 'cliente'
-                    : activeTab === 'facturas' || activeTab === 'pagos'
-                    ? 'factura'
-                    : 'agendar'
-                )
-              }
-              className="inline-flex items-center gap-1.5 bg-[#C41625] hover:bg-[#a6121f] text-white text-xs font-semibold px-4 py-2.5 rounded-full transition cursor-pointer shadow-xs"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>
-                {activeTab === 'clientes'
-                  ? 'Nuevo Cliente'
-                  : activeTab === 'facturas' || activeTab === 'pagos'
-                  ? 'Nueva Factura'
-                  : 'Agendar'}
-              </span>
-            </button>
-          </div>
-        </header>
-
-        {/* Main Content Canvas */}
-        <main className="p-4 sm:p-8 max-w-5xl w-full space-y-6">
-          {/* Top KPI Summary Cards (Always visible for instant Dashboard clarity) */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-[#181818] text-white rounded-3xl p-4 sm:p-5 shadow-sm">
-              <span className="text-[11px] text-neutral-400 flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-                Ingresos Mes
-              </span>
-              <strong className="font-editorial text-xl sm:text-2xl font-bold block mt-1">
-                {formatCLP(totalPagado)}
-              </strong>
-            </div>
-
-            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs">
-              <span className="text-[11px] text-neutral-400 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#C41625]" />
-                Por Cobrar
-              </span>
-              <strong className="font-editorial text-xl sm:text-2xl font-bold text-[#C41625] block mt-1">
-                {formatCLP(totalPorCobrar)}
-              </strong>
-            </div>
-
-            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs">
-              <span className="text-[11px] text-neutral-400">Visitas Pendientes</span>
-              <strong className="font-editorial text-xl sm:text-2xl font-bold text-neutral-900 block mt-1">
-                {pendientesCount}
-              </strong>
-            </div>
-
-            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs">
-              <span className="text-[11px] text-neutral-400">Clientes Activos</span>
-              <strong className="font-editorial text-xl sm:text-2xl font-bold text-neutral-900 block mt-1">
-                {clients.length}
-              </strong>
-            </div>
-          </div>
-
-          {/* ================= TAB 1: DASHBOARD ================= */}
-          {activeTab === 'dashboard' && (
-            <div className="space-y-6 animate-fade-up">
-              {/* Simple Service Distribution Bar */}
-              <div className="bg-white rounded-3xl p-5 border border-neutral-200/80 shadow-xs">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="font-editorial text-base sm:text-lg font-bold text-neutral-900">
-                    Servicios Activos en Puerto Montt
-                  </h2>
-                  <span className="text-xs text-neutral-400">
-                    {completadosCount}/{appointments.length} completados
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <div className="flex justify-between text-xs font-semibold mb-1">
-                      <span>Desratización</span>
-                      <span className="text-[#C41625]">{desratCount}</span>
-                    </div>
-                    <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#C41625] rounded-full"
-                        style={{ width: `${(desratCount / totalApps) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-xs font-semibold mb-1">
-                      <span>Desinsectación</span>
-                      <span>{desinsCount}</span>
-                    </div>
-                    <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#181818] rounded-full"
-                        style={{ width: `${(desinsCount / totalApps) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-xs font-semibold mb-1">
-                      <span>Sanitización</span>
-                      <span className="text-emerald-700">{sanitCount}</span>
-                    </div>
-                    <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-emerald-600 rounded-full"
-                        style={{ width: `${(sanitCount / totalApps) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 2-Column Overview: Agenda + Cobros */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                <div className="bg-white rounded-3xl p-5 border border-neutral-200/80 shadow-xs">
-                  <div className="flex items-center justify-between mb-3">
-                    <h2 className="font-editorial text-lg font-bold">Próximas Visitas</h2>
-                    <button
-                      onClick={() => setActiveTab('agendamientos')}
-                      className="text-xs font-semibold text-[#C41625] cursor-pointer"
-                    >
-                      Ver todas →
-                    </button>
-                  </div>
-                  <div className="space-y-2.5">
-                    {appointments.slice(0, 4).map((app) => {
-                      const isDone = app.estado === 'Completado';
-                      return (
-                        <div
-                          key={app.id}
-                          className="p-3 rounded-2xl bg-neutral-50 border border-neutral-200/60 flex items-center justify-between gap-2"
-                        >
-                          <div className="min-w-0">
-                            <span className="text-[10px] font-bold uppercase text-[#C41625]">
-                              {app.servicio} • {app.hora}
-                            </span>
-                            <p className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
-                              {app.clienteNombre}
-                            </p>
-                            <p className="text-[11px] text-neutral-500 truncate">{app.direccion}</p>
-                          </div>
-                          <button
-                            onClick={() =>
-                              updateAppointmentStatus(app.id, isDone ? 'Pendiente' : 'Completado')
-                            }
-                            className={`shrink-0 px-3 py-1.5 rounded-xl text-[11px] font-bold cursor-pointer ${
-                              isDone
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : 'bg-[#181818] text-white'
-                            }`}
-                          >
-                            {isDone ? '✓ Listo' : 'Completar'}
-                          </button>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-3xl p-5 border border-neutral-200/80 shadow-xs">
-                  <div className="flex items-center justify-between mb-3">
-                    <h2 className="font-editorial text-lg font-bold">Últimos Pagos</h2>
-                    <button
-                      onClick={() => setActiveTab('pagos')}
-                      className="text-xs font-semibold text-[#C41625] cursor-pointer"
-                    >
-                      Ver todos →
-                    </button>
-                  </div>
-                  <div className="space-y-2.5">
-                    {payments.slice(0, 4).map((p) => {
-                      const paid = p.estado === 'Pagado';
-                      return (
-                        <div
-                          key={p.id}
-                          className="p-3 rounded-2xl bg-neutral-50 border border-neutral-200/60 flex items-center justify-between gap-2"
-                        >
-                          <div className="min-w-0">
-                            <p className="text-xs sm:text-sm font-bold text-neutral-900 truncate">
-                              {p.clienteNombre}
-                            </p>
-                            <p className="text-xs font-bold text-[#C41625]">{formatCLP(p.monto)}</p>
-                          </div>
-                          {paid ? (
-                            <span className="text-[11px] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full">
-                              Pagado
-                            </span>
-                          ) : (
-                            <button
-                              onClick={() => updatePaymentStatus(p.id, 'Pagado')}
-                              className="bg-[#181818] text-white text-[11px] font-semibold px-3 py-1.5 rounded-xl cursor-pointer"
-                            >
-                              Cobrar
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
           )}
+        </div>
+      </header>
 
-          {/* ================= TAB 2: AGENDAMIENTOS ================= */}
-          {activeTab === 'agendamientos' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 animate-fade-up">
-              {appointments.map((app) => {
-                const isDone = app.estado === 'Completado';
-                return (
-                  <div
-                    key={app.id}
-                    className="bg-white rounded-3xl p-5 border border-neutral-200/80 shadow-xs flex items-center justify-between gap-4"
-                  >
-                    <div className="space-y-1 min-w-0">
-                      <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-neutral-100 text-neutral-800">
-                        {app.servicio} • {app.fecha} ({app.hora})
-                      </span>
-                      <h3 className="font-editorial text-lg font-bold text-neutral-900 truncate">
-                        {app.clienteNombre}
-                      </h3>
-                      <p className="text-xs text-neutral-500 flex items-center gap-1.5 truncate">
-                        <MapPin className="w-3.5 h-3.5 text-[#C41625] shrink-0" />
-                        {app.direccion}
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() =>
-                        updateAppointmentStatus(app.id, isDone ? 'Pendiente' : 'Completado')
-                      }
-                      className={`shrink-0 px-3.5 py-2 rounded-2xl text-xs font-bold transition cursor-pointer ${
-                        isDone
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-[#181818] text-white hover:bg-[#C41625]'
-                      }`}
-                    >
-                      {isDone ? '✓ Listo' : 'Completar'}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* ================= TAB 3: CLIENTES ================= */}
-          {activeTab === 'clientes' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 animate-fade-up">
-              {clients.map((c) => (
-                <div
-                  key={c.id}
-                  className="bg-white rounded-3xl p-5 border border-neutral-200/80 shadow-xs flex items-center justify-between gap-4"
-                >
-                  <div className="space-y-1 min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#C41625]">
-                      {c.tipo} • RUT {c.rut}
-                    </span>
-                    <h3 className="font-editorial text-lg font-bold text-neutral-900 truncate">
-                      {c.nombre}
-                    </h3>
-                    <p className="text-xs text-neutral-500 flex items-center gap-1.5 truncate">
-                      <MapPin className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
-                      {c.direccion}
-                    </p>
-                  </div>
-
-                  <a
-                    href={`tel:${c.telefono}`}
-                    className="shrink-0 w-10 h-10 rounded-full bg-neutral-100 hover:bg-[#C41625] hover:text-white text-neutral-700 flex items-center justify-center transition"
-                  >
-                    <Phone className="w-4 h-4" />
-                  </a>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* ================= TAB 4: PAGOS ================= */}
-          {activeTab === 'pagos' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 animate-fade-up">
-              {payments.map((p) => {
-                const paid = p.estado === 'Pagado';
-                return (
-                  <div
-                    key={p.id}
-                    className="bg-white rounded-3xl p-5 border border-neutral-200/80 shadow-xs flex items-center justify-between gap-4"
-                  >
-                    <div className="min-w-0">
-                      <span className="text-xs text-neutral-400">{p.fecha}</span>
-                      <h3 className="font-editorial text-lg font-bold text-neutral-900 truncate">
-                        {p.clienteNombre}
-                      </h3>
-                      <p className="text-sm font-extrabold text-[#C41625] mt-0.5">
-                        {formatCLP(p.monto)}
-                      </p>
-                    </div>
-
-                    {paid ? (
-                      <span className="shrink-0 inline-flex items-center gap-1 text-xs font-bold bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-full">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        Pagado
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => updatePaymentStatus(p.id, 'Pagado')}
-                        className="shrink-0 bg-[#181818] hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-2xl transition cursor-pointer"
-                      >
-                        Cobrar
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* ================= TAB 5: FACTURAS SII ================= */}
-          {activeTab === 'facturas' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 animate-fade-up">
-              {invoices.map((inv) => (
-                <div
-                  key={inv.id}
-                  className="bg-white rounded-3xl p-5 border border-neutral-200/80 shadow-xs flex items-center justify-between gap-4"
-                >
-                  <div className="min-w-0">
-                    <span className="text-[11px] font-mono font-bold text-[#C41625]">
-                      Folio SII #{inv.folioSII}
-                    </span>
-                    <h3 className="font-editorial text-lg font-bold text-neutral-900 truncate">
-                      {inv.clienteNombre}
-                    </h3>
-                    <p className="text-xs text-neutral-500 mt-0.5">
-                      Total: <strong className="text-neutral-900">{formatCLP(inv.total)}</strong>
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => setPreviewInvoice(inv)}
-                    className="shrink-0 inline-flex items-center gap-1.5 bg-neutral-100 hover:bg-[#181818] hover:text-white text-neutral-800 text-xs font-semibold px-3.5 py-2 rounded-2xl transition cursor-pointer"
-                  >
-                    <Printer className="w-3.5 h-3.5" />
-                    <span>Ver</span>
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </main>
-      </div>
-
-      {/* ================= QUICK ACTION MODAL ================= */}
-      {modalType && (
-        <div className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white w-full max-w-md rounded-t-[28px] sm:rounded-3xl p-6 shadow-2xl animate-drawer-up">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-editorial text-xl font-bold">
-                {modalType === 'cliente'
-                  ? 'Nuevo Cliente'
-                  : modalType === 'factura'
-                  ? 'Emitir Factura SII'
-                  : 'Agendar Visita'}
-              </h3>
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 space-y-6">
+        {/* Tabs */}
+        <div className="flex overflow-x-auto gap-2 pb-1">
+          {TABS.map((tab) => {
+            const IconComp = tab.icon;
+            return (
               <button
-                onClick={() => setModalType(null)}
-                className="p-2 rounded-full bg-neutral-100 cursor-pointer"
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold border transition cursor-pointer ${
+                  activeTab === tab.id
+                    ? 'bg-[#181818] text-white border-[#181818]'
+                    : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50'
+                }`}
               >
-                <X className="w-4 h-4" />
+                <IconComp className="w-3.5 h-3.5" />
+                <span>{tab.label}</span>
               </button>
+            );
+          })}
+        </div>
+
+        {/* TAB 1: EMPRESA Y ENLACES */}
+        {activeTab === 'empresa' && (
+          <form onSubmit={handleSaveCompany} className="bg-white rounded-3xl border border-neutral-200 p-6 space-y-5">
+            <div>
+              <h2 className="font-editorial text-2xl font-bold">Datos Comerciales, Central MIP & Google</h2>
+              <p className="text-xs text-neutral-500 mt-1">
+                Actualiza URLs externas (Central MIP, Google Perfil), Google Analytics GA4 y etiqueta de IVA para todo el sitio.
+              </p>
             </div>
 
-            <form onSubmit={handleQuickSubmit} className="space-y-3 text-xs sm:text-sm">
-              <input
-                required
-                placeholder="Nombre del Cliente o Empresa *"
-                value={quickForm.nombre}
-                onChange={(e) => setQuickForm({ ...quickForm, nombre: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200"
-              />
-
-              <input
-                required
-                placeholder="Dirección en Puerto Montt *"
-                value={quickForm.direccion}
-                onChange={(e) => setQuickForm({ ...quickForm, direccion: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200"
-              />
-
-              {modalType === 'factura' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div>
+                <label className="font-bold block mb-1">Nombre comercial</label>
                 <input
-                  type="number"
-                  required
-                  placeholder="Monto Neto (CLP) *"
-                  value={quickForm.monto}
-                  onChange={(e) => setQuickForm({ ...quickForm, monto: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200"
+                  type="text"
+                  value={companyForm.brandName}
+                  onChange={(e) => setCompanyForm({ ...companyForm, brandName: e.target.value })}
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
                 />
-              ) : (
+              </div>
+              <div>
+                <label className="font-bold block mb-1">Razón social</label>
                 <input
-                  required
-                  placeholder="Teléfono *"
-                  value={quickForm.telefono}
-                  onChange={(e) => setQuickForm({ ...quickForm, telefono: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-neutral-200"
+                  type="text"
+                  value={companyForm.legalName}
+                  onChange={(e) => setCompanyForm({ ...companyForm, legalName: e.target.value })}
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
                 />
-              )}
+              </div>
+              <div>
+                <label className="font-bold block mb-1">Resolución SEREMI principal</label>
+                <input
+                  type="text"
+                  value={companyForm.rexSanitaria}
+                  onChange={(e) => setCompanyForm({ ...companyForm, rexSanitaria: e.target.value })}
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="font-bold block mb-1">Modificación Dirección Técnica</label>
+                <input
+                  type="text"
+                  value={companyForm.rexModificacion}
+                  onChange={(e) => setCompanyForm({ ...companyForm, rexModificacion: e.target.value })}
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="font-bold block mb-1">Director Técnico</label>
+                <input
+                  type="text"
+                  value={companyForm.technicalDirector}
+                  onChange={(e) => setCompanyForm({ ...companyForm, technicalDirector: e.target.value })}
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="font-bold block mb-1">WhatsApp Empresarial (solo dígitos, ej: 56978666690)</label>
+                <input
+                  type="text"
+                  value={companyForm.whatsappNumber}
+                  onChange={(e) => setCompanyForm({ ...companyForm, whatsappNumber: e.target.value })}
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="font-bold block mb-1">Teléfono / WhatsApp visible (ej: +56 9 7866 6690)</label>
+                <input
+                  type="text"
+                  value={companyForm.whatsappDisplay}
+                  onChange={(e) => setCompanyForm({ ...companyForm, whatsappDisplay: e.target.value })}
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="font-bold block mb-1">Horario de atención visible</label>
+                <input
+                  type="text"
+                  value={companyForm.schedule}
+                  onChange={(e) => setCompanyForm({ ...companyForm, schedule: e.target.value })}
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="font-bold block mb-1">Correo electrónico comercial (opcional)</label>
+                <input
+                  type="email"
+                  value={companyForm.email}
+                  onChange={(e) => setCompanyForm({ ...companyForm, email: e.target.value })}
+                  placeholder="contacto@tudominio.cl"
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="font-bold block mb-1">Dirección física visible (opcional)</label>
+                <input
+                  type="text"
+                  value={companyForm.address}
+                  onChange={(e) => setCompanyForm({ ...companyForm, address: e.target.value })}
+                  placeholder="Ej: Puerto Montt, Región de Los Lagos"
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="font-bold block mb-1">Etiqueta de IVA en precios referenciales</label>
+                <select
+                  value={companyForm.ivaLabel}
+                  onChange={(e) => setCompanyForm({ ...companyForm, ivaLabel: e.target.value })}
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                >
+                  <option value="+ IVA">+ IVA (Valores netos)</option>
+                  <option value="IVA incluido">IVA incluido (Valores brutos)</option>
+                </select>
+              </div>
+              <div>
+                <label className="font-bold block mb-1">URL Portal Central MIP (Acceso Clientes)</label>
+                <input
+                  type="url"
+                  value={companyForm.centralMipUrl}
+                  onChange={(e) => setCompanyForm({ ...companyForm, centralMipUrl: e.target.value })}
+                  placeholder="https://app.centralmip.cl/..."
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="font-bold block mb-1">URL Perfil de Empresa en Google (Reseñas)</label>
+                <input
+                  type="url"
+                  value={companyForm.googleProfileUrl}
+                  onChange={(e) => setCompanyForm({ ...companyForm, googleProfileUrl: e.target.value })}
+                  placeholder="https://g.page/r/..."
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label className="font-bold block mb-1">ID de Google Analytics 4 (GA4)</label>
+                <input
+                  type="text"
+                  value={companyForm.analyticsId}
+                  onChange={(e) => setCompanyForm({ ...companyForm, analyticsId: e.target.value })}
+                  placeholder="G-XXXXXXXXXX"
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+            </div>
 
-              <div className="grid grid-cols-3 gap-2">
-                {['Desratización', 'Desinsectación', 'Sanitización'].map((srv) => (
-                  <button
-                    type="button"
-                    key={srv}
-                    onClick={() => setQuickForm({ ...quickForm, servicio: srv })}
-                    className={`py-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${
-                      quickForm.servicio === srv
-                        ? 'border-[#C41625] bg-[#C41625]/10 text-[#C41625]'
-                        : 'border-neutral-200 text-neutral-600'
-                    }`}
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 bg-[#C41625] hover:bg-[#a6121f] text-white text-xs font-bold px-6 py-3 rounded-full cursor-pointer"
+            >
+              <Save className="w-4 h-4" /> Guardar cambios de empresa
+            </button>
+          </form>
+        )}
+
+        {/* TAB 2: SERVICIOS Y PRECIOS */}
+        {activeTab === 'servicios' && (
+          <div className="space-y-4">
+            <div className="bg-white rounded-2xl border border-neutral-200 p-5">
+              <h2 className="font-editorial text-2xl font-bold">Servicios, Precios Referenciales y Modalidad IVA</h2>
+              <p className="text-xs text-neutral-600 mt-1">
+                Activa “Cotización personalizada” para trabajos especiales, contratos periódicos o pre-demolición, o ajusta fácilmente el monto referencial ({config.company.ivaLabel}).
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {config.services.map((srv) => (
+                <div key={srv.id} className="bg-white rounded-2xl border border-neutral-200 p-5 space-y-3 text-xs">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase text-[#C41625]">{srv.category}</span>
+                      <h3 className="font-bold text-sm text-neutral-900">{srv.title}</h3>
+                    </div>
+                    <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={srv.isCustomQuote}
+                        onChange={(e) => {
+                          updateService(srv.id, { isCustomQuote: e.target.checked });
+                          showToast(`Actualizado: ${srv.shortTitle}`);
+                        }}
+                      />
+                      <span>Cotización personalizada</span>
+                    </label>
+                  </div>
+
+                  {!srv.isCustomQuote && (
+                    <div>
+                      <label className="font-semibold block mb-1">
+                        Precio base referencial CLP ({config.company.ivaLabel})
+                      </label>
+                      <input
+                        type="number"
+                        value={srv.priceBase || 0}
+                        onChange={(e) => updateService(srv.id, { priceBase: Number(e.target.value) || 0 })}
+                        className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="font-semibold block mb-1">Título del servicio</label>
+                    <input
+                      type="text"
+                      value={srv.title}
+                      onChange={(e) => updateService(srv.id, { title: e.target.value })}
+                      className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-semibold block mb-1">Resumen comercial</label>
+                    <textarea
+                      rows={2}
+                      value={srv.summary}
+                      onChange={(e) => updateService(srv.id, { summary: e.target.value })}
+                      className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="font-semibold block mb-1">Descripción técnica completa</label>
+                    <textarea
+                      rows={3}
+                      value={srv.description}
+                      onChange={(e) => updateService(srv.id, { description: e.target.value })}
+                      className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 3: GALERÍA DE TRABAJOS */}
+        {activeTab === 'galeria' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <form onSubmit={handleAddPhoto} className="lg:col-span-5 bg-white rounded-3xl border border-neutral-200 p-6 space-y-4 text-xs h-fit">
+              <h2 className="font-editorial text-xl font-bold">Agregar fotografía de trabajo en terreno</h2>
+
+              <div>
+                <label className="font-bold block mb-1">Título del trabajo *</label>
+                <input
+                  type="text"
+                  value={newPhoto.title}
+                  onChange={(e) => setNewPhoto({ ...newPhoto, title: e.target.value })}
+                  placeholder="Ej: Instalación de cordón cebadero"
+                  required
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold block mb-1">Categoría</label>
+                  <select
+                    value={newPhoto.category}
+                    onChange={(e) => setNewPhoto({ ...newPhoto, category: e.target.value })}
+                    className="w-full rounded-xl border border-neutral-300 px-3 py-2"
                   >
-                    {srv}
-                  </button>
-                ))}
+                    {GALLERY_CATEGORIES.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold block mb-1">Ubicación general (sin exponer cliente)</label>
+                  <input
+                    type="text"
+                    value={newPhoto.location}
+                    onChange={(e) => setNewPhoto({ ...newPhoto, location: e.target.value })}
+                    className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold block mb-1">Subir foto desde dispositivo o pegar URL *</label>
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLocalImageUpload}
+                    className="text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-[#181818] file:text-white file:font-semibold"
+                  />
+                  <input
+                    type="text"
+                    value={newPhoto.image}
+                    onChange={(e) => setNewPhoto({ ...newPhoto, image: e.target.value })}
+                    placeholder="O pega ruta/URL (ej: /trabajos/trabajo-1.jpg)"
+                    required
+                    className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold block mb-1">Descripción técnica breve</label>
+                <textarea
+                  rows={2}
+                  value={newPhoto.caption}
+                  onChange={(e) => setNewPhoto({ ...newPhoto, caption: e.target.value })}
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-[#C41625] hover:bg-[#a6121f] text-white font-semibold py-3.5 rounded-full transition cursor-pointer mt-2"
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#C41625] hover:bg-[#a6121f] text-white font-bold py-3 rounded-full cursor-pointer"
               >
-                Guardar
+                <Plus className="w-4 h-4" /> Publicar en Galería
               </button>
             </form>
-          </div>
-        </div>
-      )}
 
-      {/* ================= FACTURA PREVIEW MODAL ================= */}
-      {previewInvoice && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl animate-scale-in space-y-4">
-            <div className="flex items-center justify-between border-b border-neutral-200 pb-4">
+            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {config.gallery.map((item) => (
+                <div key={item.id} className="bg-white rounded-2xl border border-neutral-200 overflow-hidden flex flex-col justify-between">
+                  <div>
+                    <img src={item.image} alt={item.title} className="w-full h-40 object-cover bg-neutral-100" />
+                    <div className="p-3.5 text-xs space-y-1">
+                      <span className="text-[10px] font-bold text-[#C41625] uppercase">{item.category}</span>
+                      <p className="font-bold text-neutral-900">{item.title}</p>
+                      <p className="text-neutral-500">{item.location}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      removeGalleryItem(item.id);
+                      showToast('Elemento eliminado de la galería.');
+                    }}
+                    className="mx-3.5 mb-3.5 inline-flex items-center justify-center gap-1.5 text-xs font-semibold text-red-600 hover:bg-red-50 py-1.5 rounded-xl border border-red-200 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" /> Quitar foto
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 4: DOCUMENTOS TÉCNICOS */}
+        {activeTab === 'documentos' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <form onSubmit={handleAddDoc} className="lg:col-span-5 bg-white rounded-3xl border border-neutral-200 p-6 space-y-4 text-xs h-fit">
+              <h2 className="font-editorial text-xl font-bold">Agregar documento o ficha de muestra</h2>
+
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#C41625]">
-                  SII • Puerto Montt
-                </span>
-                <h4 className="font-editorial text-xl font-bold text-neutral-900">
-                  Factura Folio #{previewInvoice.folioSII}
-                </h4>
+                <label className="font-bold block mb-1">Título del documento *</label>
+                <input
+                  type="text"
+                  value={newDoc.title}
+                  onChange={(e) => setNewDoc({ ...newDoc, title: e.target.value })}
+                  placeholder="Ej: Certificado Técnico de Desratización"
+                  required
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
               </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold block mb-1">Categoría</label>
+                  <input
+                    type="text"
+                    value={newDoc.category}
+                    onChange={(e) => setNewDoc({ ...newDoc, category: e.target.value })}
+                    className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold block mb-1">Emisor</label>
+                  <input
+                    type="text"
+                    value={newDoc.issuer}
+                    onChange={(e) => setNewDoc({ ...newDoc, issuer: e.target.value })}
+                    className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold block mb-1">Descripción *</label>
+                <textarea
+                  rows={2}
+                  value={newDoc.desc}
+                  onChange={(e) => setNewDoc({ ...newDoc, desc: e.target.value })}
+                  required
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold block mb-1">Detalle muestra anonimizada</label>
+                <textarea
+                  rows={2}
+                  value={newDoc.previewSummary}
+                  onChange={(e) => setNewDoc({ ...newDoc, previewSummary: e.target.value })}
+                  placeholder="Resumen visible al abrir la muestra sin exponer datos de clientes..."
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+              </div>
+
               <button
-                onClick={() => setPreviewInvoice(null)}
-                className="p-2 rounded-full bg-neutral-100 cursor-pointer"
+                type="submit"
+                className="w-full inline-flex items-center justify-center gap-2 bg-[#C41625] hover:bg-[#a6121f] text-white font-bold py-3 rounded-full cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <Plus className="w-4 h-4" /> Agregar Documento
+              </button>
+            </form>
+
+            <div className="lg:col-span-7 space-y-3 text-xs">
+              {config.documentsShowcase.map((doc) => (
+                <div key={doc.id} className="bg-white rounded-2xl border border-neutral-200 p-4 space-y-2.5">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        value={doc.title}
+                        onChange={(e) => updateDocumentItem(doc.id, { title: e.target.value })}
+                        className="font-bold text-neutral-900 rounded-lg border border-neutral-300 px-2.5 py-1.5"
+                      />
+                      <input
+                        type="text"
+                        value={doc.issuer}
+                        onChange={(e) => updateDocumentItem(doc.id, { issuer: e.target.value })}
+                        className="text-neutral-600 rounded-lg border border-neutral-300 px-2.5 py-1.5"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        removeDocumentItem(doc.id);
+                        showToast('Documento eliminado.');
+                      }}
+                      className="text-red-600 p-1.5 hover:bg-red-50 rounded-lg cursor-pointer"
+                      title="Eliminar documento"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={doc.desc}
+                    onChange={(e) => updateDocumentItem(doc.id, { desc: e.target.value })}
+                    className="w-full rounded-lg border border-neutral-300 px-2.5 py-1.5 text-neutral-700"
+                  />
+                  <textarea
+                    rows={2}
+                    value={doc.previewSummary}
+                    onChange={(e) => updateDocumentItem(doc.id, { previewSummary: e.target.value })}
+                    className="w-full rounded-lg border border-neutral-200 bg-neutral-50 px-2.5 py-1.5 text-neutral-600"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 5: COBERTURA Y RESEÑAS */}
+        {activeTab === 'cobertura' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Cobertura */}
+            <div className="bg-white rounded-3xl border border-neutral-200 p-6 space-y-4 text-xs">
+              <h2 className="font-editorial text-xl font-bold">Zonas de Cobertura Territorial</h2>
+              <form onSubmit={handleAddArea} className="grid grid-cols-2 gap-2.5">
+                <input
+                  type="text"
+                  placeholder="Nombre comuna / ciudad *"
+                  value={newArea.name}
+                  onChange={(e) => setNewArea({ ...newArea, name: e.target.value })}
+                  required
+                  className="rounded-xl border border-neutral-300 px-3 py-2"
+                />
+                <input
+                  type="text"
+                  placeholder="Provincia"
+                  value={newArea.province}
+                  onChange={(e) => setNewArea({ ...newArea, province: e.target.value })}
+                  className="rounded-xl border border-neutral-300 px-3 py-2"
+                />
+                <input
+                  type="text"
+                  placeholder="Sectores / alcance"
+                  value={newArea.detail}
+                  onChange={(e) => setNewArea({ ...newArea, detail: e.target.value })}
+                  className="col-span-2 rounded-xl border border-neutral-300 px-3 py-2"
+                />
+                <button type="submit" className="col-span-2 bg-[#181818] text-white font-bold py-2.5 rounded-full cursor-pointer">
+                  + Agregar localidad
+                </button>
+              </form>
+
+              <div className="max-h-72 overflow-y-auto space-y-2 pt-2">
+                {config.coverageAreas.map((area) => (
+                  <div key={area.id} className="flex items-center justify-between bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2">
+                    <div>
+                      <p className="font-bold">{area.name} <span className="font-normal text-neutral-500">({area.province})</span></p>
+                      <p className="text-[11px] text-neutral-500">{area.detail}</p>
+                    </div>
+                    <button
+                      onClick={() => removeCoverageArea(area.id)}
+                      className="text-red-600 p-1.5 hover:bg-red-50 rounded-lg cursor-pointer"
+                      title="Eliminar"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Reseñas */}
+            <div className="bg-white rounded-3xl border border-neutral-200 p-6 space-y-4 text-xs">
+              <h2 className="font-editorial text-xl font-bold">Reseñas y Testimonios de Clientes</h2>
+              <form onSubmit={handleAddReview} className="space-y-2.5">
+                <div className="grid grid-cols-2 gap-2.5">
+                  <input
+                    type="text"
+                    placeholder="Nombre cliente o empresa *"
+                    value={newReview.author}
+                    onChange={(e) => setNewReview({ ...newReview, author: e.target.value })}
+                    required
+                    className="rounded-xl border border-neutral-300 px-3 py-2"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Rubro / Comuna"
+                    value={newReview.sector}
+                    onChange={(e) => setNewReview({ ...newReview, sector: e.target.value })}
+                    className="rounded-xl border border-neutral-300 px-3 py-2"
+                  />
+                </div>
+                <textarea
+                  rows={2}
+                  placeholder="Texto de la reseña real (puedes copiarla desde Google) *"
+                  value={newReview.text}
+                  onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
+                  required
+                  className="w-full rounded-xl border border-neutral-300 px-3 py-2"
+                />
+                <button type="submit" className="w-full bg-[#C41625] text-white font-bold py-2.5 rounded-full cursor-pointer">
+                  + Agregar reseña
+                </button>
+              </form>
+
+              <div className="max-h-72 overflow-y-auto space-y-2 pt-2">
+                {config.reviews.map((rev) => (
+                  <div key={rev.id} className="bg-neutral-50 border border-neutral-200 rounded-xl p-3 flex justify-between gap-3">
+                    <div>
+                      <p className="font-bold flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-amber-400 text-amber-400" /> {rev.author}
+                      </p>
+                      <p className="text-[11px] text-neutral-500">{rev.sector}</p>
+                      <p className="mt-1 text-neutral-700">{rev.text}</p>
+                    </div>
+                    <button
+                      onClick={() => removeReview(rev.id)}
+                      className="text-red-600 p-1.5 h-fit hover:bg-red-50 rounded-lg cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB 6: COTIZACIONES Y ESTADÍSTICAS */}
+        {activeTab === 'metricas' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs text-neutral-600">
+                Métricas locales del navegador + integración con Google Analytics 4 (GA4).
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setMetrics(loadLocalMetrics());
+                  showToast('Estadísticas actualizadas.');
+                }}
+                className="inline-flex items-center gap-1.5 bg-white border border-neutral-200 hover:bg-neutral-50 text-xs font-semibold px-3.5 py-2 rounded-full cursor-pointer"
+              >
+                <RefreshCw className="w-3.5 h-3.5" /> Actualizar lectura
               </button>
             </div>
 
-            <div className="text-xs space-y-2 bg-neutral-50 p-4 rounded-2xl">
-              <div className="flex justify-between">
-                <span className="text-neutral-400">Cliente:</span>
-                <strong>{previewInvoice.clienteNombre}</strong>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-400">RUT:</span>
-                <strong>{previewInvoice.rut}</strong>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-neutral-400">Servicio:</span>
-                <span className="text-right">{previewInvoice.servicioDetalle}</span>
-              </div>
-              <div className="flex justify-between pt-2 border-t border-neutral-200 text-sm text-[#C41625]">
-                <span className="font-bold">Total (IVA Incl.):</span>
-                <strong className="font-extrabold">{formatCLP(previewInvoice.total)}</strong>
-              </div>
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+              {[
+                { label: 'Visitas registradas (local)', value: metrics.pageViews || 0 },
+                { label: 'Cotizaciones enviadas', value: metrics.quoteSubmissions || 0 },
+                { label: 'Clics en WhatsApp', value: metrics.whatsappClicks || 0 },
+                { label: 'Clics Acceso Clientes', value: metrics.clientPortalClicks || 0 },
+                {
+                  label: 'Google Analytics 4',
+                  value: config.company.analyticsId ? config.company.analyticsId : 'Sin configurar'
+                }
+              ].map((stat, idx) => (
+                <div key={idx} className="bg-white border border-neutral-200 rounded-2xl p-4">
+                  <p className="text-[11px] text-neutral-500 font-semibold">{stat.label}</p>
+                  <p className="font-editorial text-xl font-bold text-neutral-900 mt-1">{stat.value}</p>
+                </div>
+              ))}
             </div>
 
-            <div className="flex gap-2">
+            <div className="bg-white border border-neutral-200 rounded-3xl p-6 space-y-3">
+              <h2 className="font-editorial text-xl font-bold">Servicios más consultados (local)</h2>
+              {Object.keys(metrics.serviceViews || {}).length === 0 ? (
+                <p className="text-xs text-neutral-500">
+                  Aún no hay vistas registradas en fichas de servicio individuales desde este navegador.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
+                  {Object.entries(metrics.serviceViews)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([srvName, count]) => (
+                      <div key={srvName} className="flex items-center justify-between bg-neutral-50 border border-neutral-200 rounded-xl px-3.5 py-2.5">
+                        <span className="font-semibold text-neutral-800 truncate pr-2">{srvName}</span>
+                        <span className="font-bold text-[#C41625] shrink-0">{count}</span>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white border border-neutral-200 rounded-3xl p-6 space-y-4">
+              <h2 className="font-editorial text-xl font-bold">Historial local de cotizaciones generadas</h2>
+              {quoteRequests.length === 0 ? (
+                <p className="text-xs text-neutral-500">
+                  Aún no se han generado cotizaciones desde este navegador. Las solicitudes reales también llegan directo al WhatsApp {config.company.whatsappDisplay}.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {quoteRequests.map((q) => (
+                    <div key={q.id} className="border border-neutral-200 rounded-2xl p-4 text-xs flex flex-wrap items-center justify-between gap-3">
+                      <div className="space-y-0.5">
+                        <p className="font-bold text-neutral-900">
+                          {q.id} · {q.clientName} ({q.phone})
+                        </p>
+                        <p className="text-neutral-600">
+                          {q.serviceTitle} · {q.comuna} {q.sector ? `(${q.sector})` : ''} · {q.sqm} m²
+                        </p>
+                        <p className="text-[#C41625] font-semibold">{q.priceReference}</p>
+                      </div>
+                      {q.whatsappUrl && (
+                        <a
+                          href={q.whatsappUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 bg-[#25D366] text-white font-bold px-4 py-2 rounded-full"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" /> Reabrir WhatsApp <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* TAB 6: RESPALDO JSON */}
+        {activeTab === 'respaldo' && (
+          <div className="bg-white rounded-3xl border border-neutral-200 p-6 space-y-5 text-xs">
+            <div>
+              <h2 className="font-editorial text-xl font-bold">Exportar, Importar o Restaurar Configuración</h2>
+              <p className="text-neutral-600 mt-1">
+                Los cambios hechos en este panel se guardan en este navegador. Exporta el archivo JSON si deseas respaldar o replicar los cambios en otro dispositivo o actualizar la configuración por defecto.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
               <button
-                onClick={() => window.print()}
-                className="flex-1 bg-[#181818] text-white text-xs font-semibold py-3 rounded-full cursor-pointer"
+                onClick={handleDownloadJson}
+                className="inline-flex items-center gap-2 bg-[#181818] text-white font-bold px-5 py-2.5 rounded-full cursor-pointer"
               >
-                Imprimir PDF
+                <Download className="w-4 h-4" /> Descargar respaldo JSON
               </button>
               <button
-                onClick={() => setPreviewInvoice(null)}
-                className="flex-1 bg-neutral-100 text-neutral-700 text-xs font-semibold py-3 rounded-full cursor-pointer"
+                onClick={() => {
+                  resetConfigToDefault();
+                  setCompanyForm(DEFAULT_SITE_CONFIG.company);
+                  showToast('Configuración restaurada a valores originales.');
+                }}
+                className="inline-flex items-center gap-2 border border-red-300 text-red-700 font-bold px-5 py-2.5 rounded-full cursor-pointer"
               >
-                Cerrar
+                <RotateCcw className="w-4 h-4" /> Restaurar valores por defecto
+              </button>
+            </div>
+
+            <div className="space-y-2 pt-3 border-t border-neutral-200">
+              <label className="font-bold block">Importar JSON de configuración</label>
+              <textarea
+                rows={4}
+                value={importText}
+                onChange={(e) => setImportText(e.target.value)}
+                placeholder="Pega aquí el contenido del archivo .json exportado previamente..."
+                className="w-full rounded-xl border border-neutral-300 p-3 font-mono text-[11px]"
+              />
+              <button
+                onClick={handleImportJson}
+                className="inline-flex items-center gap-2 bg-[#C41625] text-white font-bold px-5 py-2.5 rounded-full cursor-pointer"
+              >
+                <Upload className="w-4 h-4" /> Importar JSON
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
