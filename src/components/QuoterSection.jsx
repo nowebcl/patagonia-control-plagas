@@ -135,38 +135,6 @@ export default function QuoterSection({ preselectedComuna = '', preselectedComun
 
   const numericSqm = Math.max(0, Number(sqm) || 0);
 
-  const pricingEvaluation = useMemo(() => {
-    const forceCustom =
-      !selectedService ||
-      selectedService.isCustomQuote ||
-      !selectedService.priceBase ||
-      contractMode === 'contrato' ||
-      selectedPropMeta.commercial ||
-      numericSqm > 280;
-
-    if (forceCustom) {
-      return {
-        isCustom: true,
-        label: 'Cotización personalizada',
-        sublabel: 'Se evalúa según superficie, rubro, frecuencia y requerimientos sanitarios.',
-        estimatedValue: null
-      };
-    }
-
-    const base = Number(selectedService.priceBase);
-    const extraSqm = Math.max(0, numericSqm - 120);
-    const extraFactor = Math.ceil(extraSqm / 50) * 8000;
-    const scopeExtra = scope === 'Ambos (Interior y Exterior)' ? 5000 : 0;
-    const total = base + extraFactor + scopeExtra;
-
-    return {
-      isCustom: false,
-      label: `Desde $${total.toLocaleString('es-CL')} ${config.company.ivaLabel}`,
-      sublabel: 'Valor referencial sujeto a confirmación técnica en terreno y características del inmueble.',
-      estimatedValue: total
-    };
-  }, [selectedService, contractMode, selectedPropMeta, numericSqm, scope, config.company.ivaLabel]);
-
   const handleServiceChange = (newId) => {
     setPreselectedServiceId(newId);
     setSubmittedRecord(null);
@@ -238,7 +206,6 @@ export default function QuoterSection({ preselectedComuna = '', preselectedComun
       `• *Cliente / Razón Social:* ${clientName.trim()}`,
       `• *Teléfono:* ${phone.trim()}`,
       `• *Email:* ${email.trim() || 'No informado'}`,
-      `• *Referencia:* ${pricingEvaluation.label}`,
       `• *Fotografías:* ${photoListText}`,
       details.trim() ? `• *Observaciones:* ${details.trim()}` : null
     ].filter(Boolean);
@@ -261,12 +228,12 @@ export default function QuoterSection({ preselectedComuna = '', preselectedComun
       phone: phone.trim(),
       email: email.trim(),
       photoCount: photos.length,
-      priceReference: pricingEvaluation.label,
-      isCustomQuote: pricingEvaluation.isCustom,
+      priceReference: 'Valorización personalizada vía WhatsApp',
+      isCustomQuote: true,
       whatsappUrl: waUrl
     });
 
-    trackQuoteSubmit(selectedService?.title || serviceId, comuna, pricingEvaluation.isCustom);
+    trackQuoteSubmit(selectedService?.title || serviceId, comuna, true);
     trackWhatsAppClick('quoter_submit');
 
     setSubmittedRecord({ ...record, whatsappUrl: waUrl, hasPhotos: photos.length > 0 });
@@ -293,29 +260,41 @@ export default function QuoterSection({ preselectedComuna = '', preselectedComun
                 </p>
               </div>
 
-              {/* Dynamic Reference Price Block */}
-              <div className="border-y border-neutral-200 py-5 space-y-2.5">
+              {/* Dynamic Live Request Summary (No public prices — WhatsApp quote) */}
+              <div className="border-y border-neutral-200 py-5 space-y-3">
                 <div className="flex items-center justify-between text-[11px] text-neutral-500">
-                  <span>Servicio seleccionado</span>
+                  <span>Resumen de tu solicitud</span>
                   <span className="text-[#C41625] font-semibold">
                     {contractMode === 'contrato' ? 'Programa Periódico' : 'Servicio Puntual'}
                   </span>
                 </div>
                 <p className="font-semibold text-base text-neutral-900">{selectedService?.title}</p>
 
-                <div className="pt-2">
-                  <p className="text-[11px] text-neutral-400 uppercase tracking-wider">Estimación de valor</p>
-                  <p className="font-editorial text-2xl sm:text-3xl font-bold text-neutral-900 mt-0.5">
-                    {pricingEvaluation.label}
-                  </p>
-                  <p className="text-xs text-neutral-600 mt-1.5 leading-relaxed">{pricingEvaluation.sublabel}</p>
-                </div>
+                <dl className="grid grid-cols-2 gap-x-4 gap-y-2 pt-2 text-xs border-t border-neutral-200/70">
+                  <div>
+                    <dt className="text-[10px] uppercase tracking-wider text-neutral-400">Plaga / Necesidad</dt>
+                    <dd className="text-neutral-800 font-medium truncate">{pestType}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] uppercase tracking-wider text-neutral-400">Propiedad</dt>
+                    <dd className="text-neutral-800 font-medium truncate">{selectedPropMeta.label}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] uppercase tracking-wider text-neutral-400">Superficie / Área</dt>
+                    <dd className="text-neutral-800 font-medium truncate">
+                      {numericSqm || 'Por confirmar'} m² · {scope === 'Ambos (Interior y Exterior)' ? 'Int. y Ext.' : scope}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-[10px] uppercase tracking-wider text-neutral-400">Comuna</dt>
+                    <dd className="text-neutral-800 font-medium truncate">{comuna}</dd>
+                  </div>
+                </dl>
 
-                <div className="pt-2 flex items-start gap-2 text-[11px] text-neutral-500 leading-relaxed">
-                  <Info className="w-3.5 h-3.5 text-[#C41625] shrink-0 mt-0.5" />
+                <div className="pt-2 flex items-start gap-2 text-xs text-neutral-600 leading-relaxed">
+                  <Info className="w-4 h-4 text-[#C41625] shrink-0 mt-0.5" />
                   <span>
-                    Trabajos especiales, contratos empresariales y pre-demolición requieren cotización personalizada.
-                    Los valores con monto indican claramente <strong>{config.company.ivaLabel}</strong>.
+                    <strong className="text-neutral-900">Cotización directa por WhatsApp:</strong> evaluamos lo que necesitas y te entregamos el valor exacto según superficie, diagnóstico y requerimientos sanitarios.
                   </span>
                 </div>
               </div>
@@ -381,7 +360,7 @@ export default function QuoterSection({ preselectedComuna = '', preselectedComun
                     {submittedRecord.comuna}
                   </p>
                   <p>
-                    <strong>Referencia:</strong> {submittedRecord.priceReference}
+                    <strong>Atención:</strong> Te enviaremos el valor personalizado directamente por WhatsApp.
                   </p>
                 </div>
 

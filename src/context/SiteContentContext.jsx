@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { DEFAULT_SITE_CONFIG } from '../data/siteConfig';
 import { initGA4 } from '../utils/analytics';
 
-const CONFIG_STORAGE_KEY = 'patagonia_site_config_v1';
+const CONFIG_STORAGE_KEY = 'patagonia_site_config_v2';
 const QUOTES_STORAGE_KEY = 'patagonia_quote_requests_v1';
 
 const SiteContentContext = createContext(null);

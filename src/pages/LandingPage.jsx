@@ -337,12 +337,8 @@ export default function LandingPage() {
                 </p>
 
                 <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs">
-                  <span className="text-neutral-400">Tarifa referencial</span>
-                  <span className="font-semibold text-neutral-900">
-                    {mobileActiveService.isCustomQuote || !mobileActiveService.priceBase
-                      ? 'Cotización personalizada'
-                      : `Desde $${Number(mobileActiveService.priceBase).toLocaleString('es-CL')} ${config.company.ivaLabel}`}
-                  </span>
+                  <span className="text-neutral-400">Valorización</span>
+                  <span className="font-semibold text-neutral-900">Evaluación vía WhatsApp</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2.5 pt-2">
@@ -397,10 +393,8 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-4 pt-3.5 border-t border-neutral-200/80 flex items-center justify-between gap-3">
-                <span className="text-xs font-semibold text-neutral-900">
-                  {srv.isCustomQuote || !srv.priceBase
-                    ? 'Cotización personalizada'
-                    : `Desde $${Number(srv.priceBase).toLocaleString('es-CL')} ${config.company.ivaLabel}`}
+                <span className="text-xs font-medium text-neutral-500">
+                  Evaluación vía WhatsApp
                 </span>
 
                 <div className="flex items-center gap-3 shrink-0">
@@ -731,19 +725,19 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 10. OPINIONES Y RESEÑAS EN GOOGLE */}
-      <section id="resenas" className="py-16 sm:py-20 px-5 sm:px-8 max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+      {/* 10. OPINIONES Y RESEÑAS EN LOOP AUTOMÁTICO (Sin imágenes) */}
+      <section id="resenas" className="py-16 sm:py-20 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
             <span className="text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
               Opiniones de Clientes
             </span>
             <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-neutral-900 mt-1.5">
-              Reseñas y Perfil de Empresa en Google
+              Lo que dicen nuestros clientes
             </h2>
           </div>
 
-          {config.company.googleProfileUrl ? (
+          {config.company.googleProfileUrl && (
             <a
               href={config.company.googleProfileUrl}
               target="_blank"
@@ -753,33 +747,35 @@ export default function LandingPage() {
               <span>Ver reseñas o evaluar en Google</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
-          ) : (
-            <span className="text-xs text-neutral-500">
-              Enlace a Google Perfil configurable desde Administración
-            </span>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {config.reviews.map((rev) => (
-            <blockquote key={rev.id} className="border-l-2 border-neutral-200 pl-5 space-y-3">
-              <div className="flex items-center gap-1">
-                {Array.from({ length: rev.rating || 5 }).map((_, sIdx) => (
-                  <Star key={sIdx} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="text-sm text-neutral-700 leading-relaxed">“{rev.text}”</p>
-              <footer className="flex items-center justify-between text-xs pt-1">
-                <div>
-                  <p className="font-semibold text-neutral-900">{rev.author}</p>
-                  <p className="text-[11px] text-neutral-500">{rev.sector}</p>
+        <div className="relative w-full overflow-hidden">
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-10 sm:w-24 bg-gradient-to-r from-[#FEFEFE] to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-10 sm:w-24 bg-gradient-to-l from-[#FEFEFE] to-transparent z-10" />
+
+          <div className="animate-marquee-left gap-5 py-2">
+            {[...config.reviews, ...config.reviews].map((rev, idx) => (
+              <blockquote
+                key={`${rev.id}-${idx}`}
+                className="w-[300px] sm:w-[370px] shrink-0 bg-[#F8F8F7] border border-neutral-200/80 rounded-2xl p-6 flex flex-col justify-between gap-4"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: rev.rating || 5 }).map((_, sIdx) => (
+                      <Star key={sIdx} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-xs sm:text-[13px] text-neutral-700 leading-relaxed">“{rev.text}”</p>
                 </div>
-                {rev.verifiedPlaceholder && (
-                  <span className="text-[10px] text-neutral-400">Administrable</span>
-                )}
-              </footer>
-            </blockquote>
-          ))}
+
+                <footer className="pt-3 border-t border-neutral-200/70">
+                  <p className="text-xs font-semibold text-neutral-900">{rev.author}</p>
+                  <p className="text-[11px] text-neutral-500 mt-0.5">{rev.sector}</p>
+                </footer>
+              </blockquote>
+            ))}
+          </div>
         </div>
       </section>
 

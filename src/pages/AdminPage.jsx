@@ -28,7 +28,7 @@ import SeoHead from '../components/SeoHead';
 
 const TABS = [
   { id: 'empresa', label: 'Empresa y Enlaces', icon: Building2 },
-  { id: 'servicios', label: 'Servicios y Precios', icon: Wrench },
+  { id: 'servicios', label: 'Servicios', icon: Wrench },
   { id: 'galeria', label: 'Galería de Trabajos', icon: Camera },
   { id: 'documentos', label: 'Documentos', icon: FileText },
   { id: 'cobertura', label: 'Cobertura y Reseñas', icon: MapPin },
@@ -472,50 +472,23 @@ export default function AdminPage() {
           </form>
         )}
 
-        {/* TAB 2: SERVICIOS Y PRECIOS */}
+        {/* TAB 2: SERVICIOS */}
         {activeTab === 'servicios' && (
           <div className="space-y-4">
             <div className="bg-white rounded-2xl border border-neutral-200 p-5">
-              <h2 className="font-editorial text-2xl font-bold">Servicios, Precios Referenciales y Modalidad IVA</h2>
+              <h2 className="font-editorial text-2xl font-bold">Servicios y Descripciones</h2>
               <p className="text-xs text-neutral-600 mt-1">
-                Activa “Cotización personalizada” para trabajos especiales, contratos periódicos o pre-demolición, o ajusta fácilmente el monto referencial ({config.company.ivaLabel}).
+                Edita títulos, resúmenes y descripciones técnicas de cada servicio. Las cotizaciones se valorizan de forma personalizada directamente por WhatsApp.
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {config.services.map((srv) => (
                 <div key={srv.id} className="bg-white rounded-2xl border border-neutral-200 p-5 space-y-3 text-xs">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <span className="text-[10px] font-bold uppercase text-[#C41625]">{srv.category}</span>
-                      <h3 className="font-bold text-sm text-neutral-900">{srv.title}</h3>
-                    </div>
-                    <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={srv.isCustomQuote}
-                        onChange={(e) => {
-                          updateService(srv.id, { isCustomQuote: e.target.checked });
-                          showToast(`Actualizado: ${srv.shortTitle}`);
-                        }}
-                      />
-                      <span>Cotización personalizada</span>
-                    </label>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase text-[#C41625]">{srv.category}</span>
+                    <h3 className="font-bold text-sm text-neutral-900">{srv.title}</h3>
                   </div>
-
-                  {!srv.isCustomQuote && (
-                    <div>
-                      <label className="font-semibold block mb-1">
-                        Precio base referencial CLP ({config.company.ivaLabel})
-                      </label>
-                      <input
-                        type="number"
-                        value={srv.priceBase || 0}
-                        onChange={(e) => updateService(srv.id, { priceBase: Number(e.target.value) || 0 })}
-                        className="w-full rounded-xl border border-neutral-300 px-3 py-2"
-                      />
-                    </div>
-                  )}
 
                   <div>
                     <label className="font-semibold block mb-1">Título del servicio</label>

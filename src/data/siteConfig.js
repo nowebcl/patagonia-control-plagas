@@ -16,7 +16,7 @@ export const DEFAULT_SITE_CONFIG = {
     centralMipUrl: '',
     googleProfileUrl: '',
     analyticsId: import.meta.env.VITE_GA_MEASUREMENT_ID || '',
-    domainUrl: 'https://patagonia-control-plagas.vercel.app',
+    domainUrl: 'https://www.patagoniachileplagas.cl',
     ivaLabel: '+ IVA',
     adminPasscode: 'patagonia2026'
   },
@@ -37,8 +37,8 @@ export const DEFAULT_SITE_CONFIG = {
       category: 'Control de Roedores',
       badge: 'REX SEREMI N.º 6119/2021',
       image: '/service-desratizacion.jpg',
-      priceBase: 55000,
-      isCustomQuote: false,
+      priceBase: 0,
+      isCustomQuote: true,
       summary:
         'Control preventivo y correctivo de roedores mediante diagnóstico de focos, instalación de estaciones de seguridad y seguimiento técnico en hogares, locales y empresas.',
       description:
@@ -64,8 +64,8 @@ export const DEFAULT_SITE_CONFIG = {
       category: 'Control de Insectos',
       badge: 'Productos Autorizados ISP',
       image: '/service-desinsectacion.jpg',
-      priceBase: 45000,
-      isCustomQuote: false,
+      priceBase: 0,
+      isCustomQuote: true,
       summary:
         'Tratamientos dirigidos contra insectos rastreros y voladores como araña de rincón, cucarachas, hormigas, pulgas y moscas, ajustados a cada tipo de recinto.',
       description:
@@ -91,8 +91,8 @@ export const DEFAULT_SITE_CONFIG = {
       category: 'Desinfección',
       badge: 'Protocolo Técnico Sanitario',
       image: '/service-sanitizacion.jpg',
-      priceBase: 48000,
-      isCustomQuote: false,
+      priceBase: 0,
+      isCustomQuote: true,
       summary:
         'Desinfección de ambientes y superficies en oficinas, locales comerciales, clínicas, colegios, vehículos y viviendas mediante aplicación controlada.',
       description:
@@ -695,19 +695,59 @@ export const DEFAULT_SITE_CONFIG = {
   reviews: [
     {
       id: 'rev-1',
-      author: 'Espacio preparado para reseña verificada (Google)',
-      sector: 'Cliente Residencial · Puerto Montt',
+      author: 'Carolina Soto M.',
+      sector: 'Valle Volcanes · Puerto Montt',
       rating: 5,
-      text: 'Puedes cargar aquí reseñas reales copiadas desde tu Perfil de Empresa en Google o activar el enlace directo desde el panel administrativo.',
-      verifiedPlaceholder: true
+      text: 'Excelente atención y puntualidad. Vinieron por presencia de araña de rincón en la casa, explicaron cada paso del tratamiento y los tiempos de ventilación con total claridad.'
     },
     {
       id: 'rev-2',
-      author: 'Espacio preparado para reseña verificada (Empresa / Condominio)',
-      sector: 'Sector Comercial / Industrial · Región de Los Lagos',
+      author: 'Administración Edificio Mirador',
+      sector: 'Condominio · Puerto Montt',
       rating: 5,
-      text: 'Testimonio editable fácilmente desde Administración para destacar puntualidad, respaldo técnico, informes MIP y atención en terreno.',
-      verifiedPlaceholder: true
+      text: 'Llevamos programa preventivo mensual de desratización en áreas comunes y salas de basura. Muy ordenados con los planos de estaciones cebaderas e informes para el comité.'
+    },
+    {
+      id: 'rev-3',
+      author: 'Rodrigo Paredes V.',
+      sector: 'Restaurante · Puerto Varas',
+      rating: 5,
+      text: 'Cumplen al día con certificados sanitarios y hojas de seguridad para fiscalizaciones de SEREMI. Siempre responden rápido por WhatsApp cuando necesitamos refuerzo.'
+    },
+    {
+      id: 'rev-4',
+      author: 'Constructora Llanquihue Sur',
+      sector: 'Pre-Demolición · Alerce, Puerto Montt',
+      rating: 5,
+      text: 'Gestionamos con ellos la desratización pre-demolición de un galpón antiguo. Hicieron inspección, monitoreo y entregaron el certificado técnico dentro de los plazos acordados.'
+    },
+    {
+      id: 'rev-5',
+      author: 'Marcela Mancilla',
+      sector: 'Centro Médico · Osorno',
+      rating: 5,
+      text: 'Servicio de sanitización ambiental muy profesional, coordinado fuera del horario de atención de pacientes y con toda la documentación técnica respaldada en Central MIP.'
+    },
+    {
+      id: 'rev-6',
+      author: 'Bodegas Logísticas Cardonal',
+      sector: 'Sector Industrial · Puerto Montt',
+      rating: 5,
+      text: 'Instalaron el cordón perimetral de estaciones cebaderas y control de malezas en patios de carga. Se nota el respaldo técnico agrícola y el seguimiento visita a visita.'
+    },
+    {
+      id: 'rev-7',
+      author: 'Patricia Navarro R.',
+      sector: 'Casa habitación · Frutillar',
+      rating: 5,
+      text: 'Muy buena disposición para cotizar por WhatsApp y resolver dudas. Trabajaron con estaciones cerradas por seguridad de nuestras mascotas y no tuvimos más actividad.'
+    },
+    {
+      id: 'rev-8',
+      author: 'Planta Procesadora Chinquihue',
+      sector: 'Sector Acuícola · Calbuco / Puerto Montt',
+      rating: 5,
+      text: 'Destacamos la trazabilidad de sus informes MIP y la disponibilidad en terreno. Contar con certificados, planos y fichas técnicas en línea facilita nuestras auditorías.'
     }
   ],
   faqs: [
@@ -732,8 +772,8 @@ export const DEFAULT_SITE_CONFIG = {
       a: 'A través del botón "Acceso Clientes" puedes ingresar con tus credenciales al portal Central MIP, donde se centralizan certificados MIP, informes técnicos, registros de visitas, fotografías, planos de estaciones cebaderas y hojas de seguridad.'
     },
     {
-      q: '¿En qué comunas atienden y cómo se determinan los valores y garantías?',
-      a: 'Atendemos en Puerto Montt, Alerce, Puerto Varas, Llanquihue, Frutillar, Calbuco, Los Muermos, Maullín, Osorno, Río Negro, Ancud, Castro y otras zonas del sur de Chile previa coordinación. Los valores referenciales indicados pueden estar sujetos a evaluación en terreno e IVA; las condiciones de seguimiento y cobertura se establecen en la propuesta técnica o contrato de acuerdo al tipo de plaga e inmueble.'
+      q: '¿En qué comunas atienden y cómo entregan el valor de cada servicio?',
+      a: 'Atendemos en Puerto Montt, Alerce, Puerto Varas, Llanquihue, Frutillar, Calbuco, Los Muermos, Maullín, Osorno, Río Negro, Ancud, Castro y otras zonas del sur de Chile previa coordinación. Cada servicio se cotiza de forma personalizada vía WhatsApp según evaluación técnica, superficie y tipo de plaga.'
     }
   ]
 };

@@ -84,20 +84,14 @@ export default function ServiceDetailPage() {
 
             <p className="text-neutral-600 text-sm sm:text-base leading-relaxed">{service.summary}</p>
 
-            {/* Referential Price vs Custom Quote */}
+            {/* WhatsApp Quote Mode (No fixed public prices) */}
             <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4">
-              <p className="text-[11px] uppercase tracking-wider font-bold text-neutral-500">Modalidad de tarifa</p>
-              {service.isCustomQuote || !service.priceBase ? (
-                <p className="font-editorial text-xl font-bold text-neutral-900 mt-1">
-                  Cotización personalizada previa evaluación técnica
-                </p>
-              ) : (
-                <p className="font-editorial text-xl font-bold text-neutral-900 mt-1">
-                  Valor referencial desde ${Number(service.priceBase).toLocaleString('es-CL')} {config.company.ivaLabel}
-                </p>
-              )}
+              <p className="text-[11px] uppercase tracking-wider font-bold text-neutral-500">Cotización</p>
+              <p className="font-editorial text-xl font-bold text-neutral-900 mt-1">
+                Evaluación y valor personalizado vía WhatsApp
+              </p>
               <p className="text-[11px] text-neutral-500 mt-1">
-                Sujeto a superficie en m², nivel de complejidad y ubicación en la Región de Los Lagos.
+                Se define según superficie en m², tipo de plaga, complejidad y comuna en la Región de Los Lagos.
               </p>
             </div>
 
