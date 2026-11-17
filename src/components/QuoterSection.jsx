@@ -274,43 +274,45 @@ export default function QuoterSection({ preselectedComuna = '', preselectedComun
   };
 
   return (
-    <section id="cotizador" className="py-12 md:py-16 px-4 sm:px-6 max-w-6xl mx-auto">
-      <div className="bg-white rounded-[28px] shadow-[0_24px_60px_rgba(24,24,24,0.08)] border border-neutral-200/80 overflow-hidden">
+    <section id="cotizador" className="py-16 sm:py-24 px-5 sm:px-8 max-w-6xl mx-auto">
+      <div className="bg-white rounded-3xl border border-neutral-200/90 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-12">
-          {/* Left Side: Technical Summary & Pricing Card */}
-          <div className="lg:col-span-5 bg-[#181818] text-white p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
-            <div className="relative z-10 space-y-6">
+          {/* Left Side: Minimal Warm-Stone Technical Summary */}
+          <div className="lg:col-span-5 bg-[#F8F8F7] text-neutral-900 p-7 sm:p-10 border-b lg:border-b-0 lg:border-r border-neutral-200/80 flex flex-col justify-between">
+            <div className="space-y-6">
               <div>
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#ff6b78] bg-[#C41625]/15 border border-[#C41625]/30 px-3 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
                   <Calculator className="w-3.5 h-3.5" /> Cotizador en Línea
                 </span>
-                <h2 className="font-editorial text-2xl sm:text-3xl font-bold mt-4 leading-tight">
+                <h2 className="font-editorial text-3xl font-bold mt-2 leading-tight text-neutral-900">
                   Solicita tu cotización técnica
                 </h2>
-                <p className="text-neutral-300 text-xs sm:text-sm mt-2 leading-relaxed">
+                <p className="text-neutral-600 text-xs sm:text-sm mt-2 leading-relaxed">
                   Envía los antecedentes de tu inmueble o empresa y recibe la evaluación directamente en nuestro WhatsApp{' '}
-                  <strong className="text-white">{config.company.whatsappDisplay}</strong>.
+                  <strong className="text-neutral-900">{config.company.whatsappDisplay}</strong>.
                 </p>
               </div>
 
-              {/* Dynamic Reference Price Card */}
-              <div className="bg-white/5 border border-white/15 rounded-2xl p-5 space-y-2.5">
-                <div className="flex items-center justify-between text-[11px] text-neutral-400">
+              {/* Dynamic Reference Price Block */}
+              <div className="border-y border-neutral-200 py-5 space-y-2.5">
+                <div className="flex items-center justify-between text-[11px] text-neutral-500">
                   <span>Servicio seleccionado</span>
-                  <span className="text-[#ff6b78] font-semibold">
+                  <span className="text-[#C41625] font-semibold">
                     {contractMode === 'contrato' ? 'Programa Periódico' : 'Servicio Puntual'}
                   </span>
                 </div>
-                <p className="font-bold text-base text-white">{selectedService?.title}</p>
+                <p className="font-semibold text-base text-neutral-900">{selectedService?.title}</p>
 
-                <div className="pt-2 border-t border-white/10">
+                <div className="pt-2">
                   <p className="text-[11px] text-neutral-400 uppercase tracking-wider">Estimación de valor</p>
-                  <p className="font-editorial text-2xl font-bold text-white mt-0.5">{pricingEvaluation.label}</p>
-                  <p className="text-[11px] text-neutral-300 mt-1.5 leading-relaxed">{pricingEvaluation.sublabel}</p>
+                  <p className="font-editorial text-2xl sm:text-3xl font-bold text-neutral-900 mt-0.5">
+                    {pricingEvaluation.label}
+                  </p>
+                  <p className="text-xs text-neutral-600 mt-1.5 leading-relaxed">{pricingEvaluation.sublabel}</p>
                 </div>
 
-                <div className="pt-2 flex items-center gap-2 text-[11px] text-neutral-300 bg-white/5 rounded-xl p-2.5 border border-white/10">
-                  <Info className="w-4 h-4 text-[#ff6b78] shrink-0" />
+                <div className="pt-2 flex items-start gap-2 text-[11px] text-neutral-500 leading-relaxed">
+                  <Info className="w-3.5 h-3.5 text-[#C41625] shrink-0 mt-0.5" />
                   <span>
                     Trabajos especiales, contratos empresariales y pre-demolición requieren cotización personalizada.
                     Los valores con monto indican claramente <strong>{config.company.ivaLabel}</strong>.
@@ -319,28 +321,28 @@ export default function QuoterSection({ preselectedComuna = '', preselectedComun
               </div>
 
               {/* Sanitary Backing Reminder */}
-              <div className="space-y-2 text-xs text-neutral-300">
+              <div className="space-y-2.5 text-xs text-neutral-600">
                 <div className="flex items-start gap-2.5">
-                  <ShieldCheck className="w-4 h-4 text-[#ff6b78] shrink-0 mt-0.5" />
+                  <ShieldCheck className="w-4 h-4 text-[#C41625] shrink-0 mt-0.5" />
                   <p>
-                    Respaldo sanitario: <strong className="text-white">{config.company.rexSanitaria}</strong> ·{' '}
+                    Respaldo sanitario: <strong className="text-neutral-900">{config.company.rexSanitaria}</strong> ·{' '}
                     {config.company.rexModificacion}.
                   </p>
                 </div>
                 <div className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-[#ff6b78] shrink-0 mt-0.5" />
+                  <MapPin className="w-4 h-4 text-[#C41625] shrink-0 mt-0.5" />
                   <p>Cobertura en Puerto Montt, Puerto Varas, Osorno, Chiloé y Región de Los Lagos.</p>
                 </div>
               </div>
             </div>
 
-            <div className="relative z-10 mt-8 pt-5 border-t border-white/10 text-[11px] text-neutral-400">
+            <div className="mt-8 pt-5 border-t border-neutral-200 text-[11px] text-neutral-500">
               {config.company.legalName} · Director Técnico: {config.company.technicalDirector}
             </div>
           </div>
 
           {/* Right Side: Full Form */}
-          <div className="lg:col-span-7 p-6 sm:p-8 bg-white">
+          <div className="lg:col-span-7 p-7 sm:p-10 bg-white">
             {submittedRecord ? (
               <div className="h-full flex flex-col justify-center space-y-5 py-4">
                 <div className="inline-flex items-center gap-2 text-emerald-700 bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-full w-fit text-xs font-bold">

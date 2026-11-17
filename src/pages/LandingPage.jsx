@@ -3,17 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   ShieldCheck,
   ArrowRight,
-  Calculator,
   Lock,
-  Building2,
   CheckCircle2,
   Star,
   ExternalLink,
   ChevronDown,
-  Camera,
   PhoneCall,
-  MapPin,
-  FileCheck2
+  MapPin
 } from 'lucide-react';
 import { useSiteContent } from '../context/SiteContentContext';
 import { trackClientPortalClick, trackWhatsAppClick } from '../utils/analytics';
@@ -111,43 +107,47 @@ export default function LandingPage() {
 
       <Navbar />
 
-      {/* 1. HERO EDITORIAL — Compact Mobile Fit & Desktop Composition */}
-      <section className="relative bg-[#181818] text-white pt-5 pb-8 sm:pt-10 sm:pb-14 md:pt-12 md:pb-16 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
-          {/* Left Column: Title, Sanitary Badge & Actions */}
-          <div className="lg:col-span-6 space-y-3.5 sm:space-y-5 z-10">
-            <div className="inline-flex items-center gap-1.5 bg-[#C41625]/20 border border-[#C41625]/40 text-[#ff8690] text-[10px] sm:text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#ff6b78] shrink-0" />
-              <span>{config.company.rexSanitaria} · SEREMI Los Lagos</span>
+      {/* 1. HERO EDITORIAL — Light, airy and uncluttered */}
+      <section className="pt-10 pb-14 sm:pt-16 sm:pb-20 px-5 sm:px-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+          {/* Left Column */}
+          <div className="lg:col-span-6 space-y-6">
+            <div className="space-y-3">
+              <div className="w-12 h-[2px] bg-[#C41625]" />
+              <p className="inline-flex items-center gap-2 text-xs font-medium text-neutral-500">
+                <ShieldCheck className="w-4 h-4 text-[#C41625] shrink-0" />
+                <span>{config.company.rexSanitaria} · SEREMI Los Lagos</span>
+              </p>
             </div>
 
-            <h1 className="font-editorial text-[1.65rem] sm:text-4xl lg:text-[2.85rem] font-bold leading-[1.15] tracking-tight text-white">
-              Control de Plagas Profesional en{' '}
-              <span className="text-[#ff6b78]">Puerto Montt</span> y la Región de Los Lagos
+            <h1 className="font-editorial text-3xl sm:text-5xl lg:text-[3.15rem] font-bold leading-[1.12] tracking-tight text-neutral-900">
+              Control de Plagas en <span className="text-[#C41625]">Puerto Montt</span> y Región de Los Lagos
             </h1>
 
-            <p className="text-neutral-300 text-xs sm:text-base leading-relaxed max-w-xl">
+            <p className="text-neutral-600 text-sm sm:text-base leading-relaxed max-w-xl">
               Desratización, desinsectación, sanitización, certificado pre-demolición y programas de Manejo Integrado de Plagas (MIP) para hogares, condominios, empresas e industrias.
             </p>
 
-            {/* Primary CTA Buttons (compact on mobile) */}
-            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-1">
+            {/* Primary Actions */}
+            <div className="flex flex-wrap items-center gap-3 pt-1">
               <button
+                type="button"
                 onClick={() => jumpToQuoter(activePest.serviceId)}
-                className="inline-flex items-center gap-2 bg-[#C41625] hover:bg-[#a6121f] text-white text-xs sm:text-sm font-bold px-4 sm:px-6 py-2.5 sm:py-3.5 rounded-full shadow-lg transition cursor-pointer"
+                className="inline-flex items-center gap-2 bg-[#C41625] hover:bg-[#a6121f] text-white text-xs sm:text-sm font-semibold px-6 py-3 rounded-full transition cursor-pointer"
               >
-                <Calculator className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>Solicitar cotización</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
 
               <button
+                type="button"
                 onClick={() => {
                   trackClientPortalClick('hero');
                   setCentralMipModalOpen(true);
                 }}
-                className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs sm:text-sm font-semibold px-4 sm:px-5 py-2.5 sm:py-3.5 rounded-full transition cursor-pointer"
+                className="inline-flex items-center gap-2 border border-neutral-300 hover:border-neutral-900 text-neutral-900 text-xs sm:text-sm font-medium px-5 py-3 rounded-full transition cursor-pointer"
               >
-                <Lock className="w-3.5 h-3.5 text-[#ff6b78]" />
+                <Lock className="w-3.5 h-3.5 text-[#C41625]" />
                 <span>Acceso Clientes</span>
               </button>
 
@@ -156,19 +156,19 @@ export default function LandingPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackWhatsAppClick('hero')}
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-300 hover:text-white px-3 py-2 transition"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-neutral-900 px-2 py-2 transition"
               >
-                <PhoneCall className="w-3.5 h-3.5 text-[#25D366]" />
+                <PhoneCall className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{config.company.whatsappDisplay}</span>
               </a>
             </div>
 
-            {/* Compact Interactive 4-Pest Selector */}
-            <div className="pt-2">
-              <p className="text-[10px] sm:text-[11px] uppercase tracking-wider font-bold text-neutral-400 mb-2">
-                ¿Qué problema deseas controlar hoy?
+            {/* Minimalist Pest Quick-Selector */}
+            <div className="pt-4 border-t border-neutral-200/80">
+              <p className="text-[11px] uppercase tracking-wider font-semibold text-neutral-400 mb-3">
+                ¿Qué necesitas controlar?
               </p>
-              <div className="grid grid-cols-4 gap-1.5 sm:gap-2.5">
+              <div className="grid grid-cols-4 gap-2">
                 {INTERACTIVE_PESTS.map((pest) => {
                   const IconComp = pest.icon;
                   const active = activePestId === pest.id;
@@ -180,31 +180,29 @@ export default function LandingPage() {
                         setActivePestId(pest.id);
                         setPreselectedServiceId(pest.serviceId);
                       }}
-                      className={`p-2 sm:p-3 rounded-xl border text-center transition cursor-pointer flex flex-col items-center gap-1 ${
+                      className={`pb-2.5 pt-2 px-1.5 border-b-2 text-center transition cursor-pointer flex flex-col items-center gap-1.5 ${
                         active
-                          ? 'bg-[#C41625] border-[#ff6b78]/40 text-white shadow-md'
-                          : 'bg-white/5 border-white/10 text-neutral-300 hover:bg-white/10'
+                          ? 'border-[#C41625] text-neutral-900'
+                          : 'border-transparent text-neutral-400 hover:text-neutral-700'
                       }`}
                     >
-                      <IconComp className="w-5 h-5 sm:w-7 sm:h-7" />
-                      <span className="text-[10px] sm:text-xs font-semibold leading-tight truncate w-full">
+                      <IconComp className="w-5 h-5 sm:w-6 sm:h-6" />
+                      <span className="text-[11px] font-medium leading-tight truncate w-full">
                         {pest.label}
                       </span>
                     </button>
                   );
                 })}
               </div>
-              <p className="text-[11px] sm:text-xs text-neutral-300 mt-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
-                <strong className="text-white">{activePest.sub}:</strong> {activePest.note}
+              <p className="text-xs text-neutral-600 mt-3 leading-relaxed">
+                <strong className="text-neutral-900 font-semibold">{activePest.sub}:</strong> {activePest.note}
               </p>
             </div>
           </div>
 
-          {/* Right Column: Hero Video Canvas (Fits symmetrically inside mobile canvas) */}
-          <div className="lg:col-span-6 relative">
-            {/* Desktop offset border — hidden on mobile so video never overflows canvas */}
-            <div className="hidden sm:block absolute -inset-3 rounded-[32px] border-2 border-[#C41625]/45 translate-x-2 translate-y-2 pointer-events-none" />
-            <div className="relative rounded-2xl sm:rounded-[28px] overflow-hidden bg-black border border-white/15 shadow-2xl aspect-[16/10] sm:aspect-[4/3]">
+          {/* Right Column: Clean Video Showcase */}
+          <div className="lg:col-span-6 space-y-3">
+            <div className="relative rounded-2xl overflow-hidden bg-neutral-900 aspect-[16/10] sm:aspect-[4/3] shadow-sm">
               <video
                 src="/gemini_generated_video_c860e715.mp4"
                 autoPlay
@@ -214,112 +212,102 @@ export default function LandingPage() {
                 poster="/service-desratizacion.jpg"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent pointer-events-none" />
-              <div className="absolute bottom-3 left-3 right-3 sm:bottom-5 sm:left-5 sm:right-5 flex items-end justify-between gap-3">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#ff8690]">
-                    {config.company.brandName}
-                  </span>
-                  <p className="text-xs sm:text-sm font-semibold text-white leading-snug">
-                    Respaldo Técnico y Dirección Profesional en Terreno
-                  </p>
-                </div>
-                <Link
-                  to="/desratizacion-pre-demolicion-puerto-montt"
-                  className="shrink-0 bg-white/95 hover:bg-white text-[#181818] text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-full transition"
-                >
-                  Pre-Demolición SEREMI →
-                </Link>
-              </div>
+            </div>
+            <div className="flex items-center justify-between gap-4 text-xs text-neutral-500 px-1">
+              <span>{config.company.brandName} · Dirección Técnica en Terreno</span>
+              <Link
+                to="/desratizacion-pre-demolicion-puerto-montt"
+                className="font-semibold text-[#C41625] hover:underline shrink-0"
+              >
+                Certificado Pre-Demolición →
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. AUTORIZACIÓN SANITARIA Y RESPALDO TÉCNICO */}
-      <section id="respaldo-sanitario" className="bg-neutral-50 border-b border-neutral-200 py-8 sm:py-10 px-4 sm:px-6">
+      {/* 2. AUTORIZACIÓN SANITARIA Y RESPALDO TÉCNICO — Clean Architectural Strip */}
+      <section id="respaldo-sanitario" className="bg-[#F8F8F7] border-y border-neutral-200/80 py-10 sm:py-12 px-5 sm:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white rounded-[24px] border border-neutral-200 p-5 sm:p-7 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-            <div className="lg:col-span-5 space-y-2">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#C41625]">
-                <ShieldCheck className="w-4 h-4" /> Empresa Autorizada SEREMI de Salud
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-7">
+            <div>
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
+                Respaldo Legal y Técnico
               </span>
-              <h2 className="font-editorial text-2xl sm:text-[1.75rem] font-bold text-neutral-900 leading-tight">
-                Autorización Sanitaria y Respaldo Técnico
+              <h2 className="font-editorial text-2xl sm:text-3xl font-bold text-neutral-900 mt-1">
+                Autorización Sanitaria Vigente
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
-                Cada tratamiento y documento técnico emitido cuenta con respaldo legal y dirección profesional verificable ante la autoridad sanitaria regional.
+            </div>
+            <p className="text-xs text-neutral-500 max-w-md">
+              Operación verificable ante la autoridad sanitaria regional, utilizando exclusivamente insumos registrados en el ISP Chile.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-neutral-200/80 border-t border-neutral-200/80 pt-6 gap-y-6">
+            <div className="sm:pr-6">
+              <p className="text-[11px] uppercase tracking-wider font-medium text-neutral-400">Razón Social</p>
+              <p className="text-sm font-semibold text-neutral-900 mt-1.5">{config.company.brandName}</p>
+              <p className="text-xs text-neutral-600 mt-1 leading-relaxed">{config.company.legalName}</p>
+            </div>
+
+            <div className="pt-5 sm:pt-0 sm:px-6">
+              <p className="text-[11px] uppercase tracking-wider font-medium text-neutral-400">Autorización SEREMI</p>
+              <p className="text-sm font-semibold text-[#C41625] mt-1.5">{config.company.rexSanitaria}</p>
+              <p className="text-xs text-neutral-600 mt-1 leading-relaxed">{config.company.rexModificacion}</p>
+            </div>
+
+            <div className="pt-5 sm:pt-0 sm:px-6">
+              <p className="text-[11px] uppercase tracking-wider font-medium text-neutral-400">Dirección Técnica</p>
+              <p className="text-sm font-semibold text-neutral-900 mt-1.5">{config.company.technicalDirector}</p>
+              <p className="text-xs text-neutral-600 mt-1 leading-relaxed">{config.company.technicalDirectorRole}</p>
+            </div>
+
+            <div className="pt-5 sm:pt-0 sm:pl-6">
+              <p className="text-[11px] uppercase tracking-wider font-medium text-neutral-400">Estándar de Aplicación</p>
+              <p className="text-sm font-semibold text-neutral-900 mt-1.5">Registro ISP y HDS</p>
+              <p className="text-xs text-neutral-600 mt-1 leading-relaxed">
+                Protocolos ajustados a etiqueta técnica y tiempos reales de reingreso.
               </p>
             </div>
-
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4">
-                <p className="text-[10px] uppercase tracking-wider font-bold text-neutral-500">Razón Social & Marca</p>
-                <p className="text-xs sm:text-sm font-bold text-neutral-900 mt-1">{config.company.brandName}</p>
-                <p className="text-xs text-neutral-600 mt-0.5">{config.company.legalName}</p>
-              </div>
-
-              <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4">
-                <p className="text-[10px] uppercase tracking-wider font-bold text-neutral-500">Resoluciones Sanitarias</p>
-                <p className="text-xs sm:text-sm font-bold text-[#C41625] mt-1">{config.company.rexSanitaria}</p>
-                <p className="text-xs text-neutral-700 mt-0.5">{config.company.rexModificacion}</p>
-              </div>
-
-              <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4">
-                <p className="text-[10px] uppercase tracking-wider font-bold text-neutral-500">Dirección Técnica</p>
-                <p className="text-xs sm:text-sm font-bold text-neutral-900 mt-1">{config.company.technicalDirector}</p>
-                <p className="text-xs text-neutral-600 mt-0.5">{config.company.technicalDirectorRole}</p>
-              </div>
-
-              <div className="bg-neutral-50 border border-neutral-200 rounded-2xl p-4 flex flex-col justify-between">
-                <div>
-                  <p className="text-[10px] uppercase tracking-wider font-bold text-neutral-500">Productos & Estándar</p>
-                  <p className="text-xs font-bold text-neutral-900 mt-1">Insumos registrados ante el ISP Chile</p>
-                </div>
-                <p className="text-[11px] text-neutral-600 mt-1">
-                  Protocolos ajustados a etiqueta y HDS sin promesas irreales.
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* 3. TODOS NUESTROS 9 SERVICIOS — Compact Full-Canvas Mobile + Editorial Desktop */}
-      <section id="servicios" className="py-10 sm:py-16 px-2 sm:px-6 max-w-7xl mx-auto">
-        <div className="px-2 sm:px-0 flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 sm:mb-8">
+      {/* 3. TODOS NUESTROS 9 SERVICIOS — Clean Minimal Cards */}
+      <section id="servicios" className="py-16 sm:py-24 px-5 sm:px-8 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
-            <span className="text-[11px] font-bold uppercase tracking-widest text-[#C41625]">
+            <span className="text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
               Servicios Especializados
             </span>
-            <h2 className="font-editorial text-2xl sm:text-4xl font-bold text-neutral-900 mt-1">
-              Nuestros 9 Servicios de Control de Plagas
+            <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-neutral-900 mt-1.5">
+              Nuestros 9 Servicios
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 mt-1.5 max-w-2xl">
-              Tratamientos puntuales para viviendas y programas técnicos periódicos para comercio, condominios e industrias.
+            <p className="text-sm text-neutral-600 mt-2 max-w-xl">
+              Soluciones puntuales para viviendas y programas técnicos continuos para comercio, condominios e industrias.
             </p>
           </div>
           <Link
             to="/desratizacion-pre-demolicion-puerto-montt"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#C41625] hover:underline shrink-0"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-900 hover:text-[#C41625] transition shrink-0"
           >
-            <span>Ver Certificado Pre-Demolición SEREMI</span>
+            <span>Desratización Pre-Demolición SEREMI</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        {/* MOBILE VIEW (< md): Full-canvas width selector + crisp single detail panel (compact, non-repetitive) */}
-        <div className="md:hidden space-y-3">
-          <div className="flex overflow-x-auto gap-1.5 pb-1 px-1 no-scrollbar">
+        {/* Mobile Compact Tabs */}
+        <div className="md:hidden space-y-4">
+          <div className="flex overflow-x-auto gap-2 pb-1 no-scrollbar">
             {config.services.map((srv, idx) => (
               <button
                 key={srv.id}
                 type="button"
                 onClick={() => setMobileServiceIdx(idx)}
-                className={`shrink-0 px-3 py-2 rounded-xl text-xs font-semibold border transition cursor-pointer ${
+                className={`shrink-0 px-3.5 py-2 rounded-full text-xs font-medium transition cursor-pointer ${
                   mobileServiceIdx === idx
-                    ? 'bg-[#181818] text-white border-[#181818]'
-                    : 'bg-white text-neutral-700 border-neutral-200'
+                    ? 'bg-[#181818] text-white'
+                    : 'bg-neutral-100 text-neutral-600'
                 }`}
               >
                 {srv.shortTitle}
@@ -328,49 +316,48 @@ export default function LandingPage() {
           </div>
 
           {mobileActiveService && (
-            <div className="bg-white border border-neutral-200 rounded-2xl overflow-hidden shadow-sm">
-              <div className="aspect-[16/9] w-full overflow-hidden bg-neutral-100 relative">
+            <div className="bg-white border border-neutral-200/80 rounded-2xl overflow-hidden">
+              <div className="aspect-[16/10] w-full overflow-hidden bg-neutral-100">
                 <img
                   src={mobileActiveService.image}
                   alt={mobileActiveService.title}
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute top-2.5 left-2.5 bg-[#181818]/90 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
-                  {mobileActiveService.category}
-                </span>
               </div>
 
-              <div className="p-4 space-y-3">
-                <div>
-                  <h3 className="font-editorial text-xl font-bold text-neutral-900 leading-snug">
-                    {mobileActiveService.title}
-                  </h3>
-                  <p className="text-xs text-neutral-600 mt-1.5 leading-relaxed">
-                    {mobileActiveService.summary}
-                  </p>
-                </div>
+              <div className="p-5 space-y-3">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#C41625]">
+                  {mobileActiveService.category}
+                </span>
+                <h3 className="font-editorial text-xl font-bold text-neutral-900 leading-snug">
+                  {mobileActiveService.title}
+                </h3>
+                <p className="text-xs text-neutral-600 leading-relaxed">
+                  {mobileActiveService.summary}
+                </p>
 
-                <div className="flex items-center justify-between text-xs bg-neutral-50 border border-neutral-200 rounded-xl px-3 py-2">
-                  <span className="text-neutral-500">Modalidad:</span>
-                  <span className="font-bold text-neutral-900">
+                <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs">
+                  <span className="text-neutral-400">Tarifa referencial</span>
+                  <span className="font-semibold text-neutral-900">
                     {mobileActiveService.isCustomQuote || !mobileActiveService.priceBase
                       ? 'Cotización personalizada'
                       : `Desde $${Number(mobileActiveService.priceBase).toLocaleString('es-CL')} ${config.company.ivaLabel}`}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 pt-1">
+                <div className="grid grid-cols-2 gap-2.5 pt-2">
                   <button
+                    type="button"
                     onClick={() => jumpToQuoter(mobileActiveService.id)}
-                    className="bg-[#C41625] text-white text-xs font-bold py-2.5 rounded-full text-center cursor-pointer"
+                    className="bg-[#C41625] text-white text-xs font-semibold py-2.5 rounded-full cursor-pointer"
                   >
-                    Cotizar servicio
+                    Cotizar
                   </button>
                   <Link
                     to={mobileActiveService.route}
-                    className="bg-neutral-100 text-neutral-900 text-xs font-semibold py-2.5 rounded-full text-center border border-neutral-200"
+                    className="border border-neutral-300 text-neutral-800 text-xs font-medium py-2.5 rounded-full text-center"
                   >
-                    Ver ficha técnica
+                    Ver ficha
                   </Link>
                 </div>
               </div>
@@ -378,58 +365,58 @@ export default function LandingPage() {
           )}
         </div>
 
-        {/* DESKTOP VIEW (>= md): Clean 3-column editorial grid showing all 9 services */}
-        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {/* Desktop Minimal 3-Column Editorial Grid */}
+        <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-x-7 gap-y-10">
           {config.services.map((srv) => (
-            <article
-              key={srv.id}
-              className="group bg-white rounded-[24px] border border-neutral-200 overflow-hidden flex flex-col justify-between hover:border-[#C41625]/40 hover:shadow-lg transition"
-            >
+            <article key={srv.id} className="group flex flex-col justify-between">
               <div>
-                <Link to={srv.route} className="block aspect-[16/10] overflow-hidden bg-neutral-100 relative">
+                <Link
+                  to={srv.route}
+                  className="block aspect-[16/10] rounded-2xl overflow-hidden bg-neutral-100 mb-4"
+                >
                   <img
                     src={srv.image}
                     alt={`${srv.title} - ${config.company.brandName}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition duration-500"
                   />
-                  <span className="absolute top-3 left-3 bg-[#181818]/90 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
-                    {srv.category}
-                  </span>
                 </Link>
 
-                <div className="p-5 space-y-2.5">
-                  <Link to={srv.route}>
-                    <h3 className="font-editorial text-xl font-bold text-neutral-900 group-hover:text-[#C41625] transition leading-snug">
-                      {srv.title}
-                    </h3>
-                  </Link>
-                  <p className="text-xs text-neutral-600 leading-relaxed line-clamp-3">{srv.summary}</p>
-                </div>
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#C41625]">
+                  {srv.category}
+                </span>
+
+                <Link to={srv.route}>
+                  <h3 className="font-editorial text-xl font-bold text-neutral-900 group-hover:text-[#C41625] transition leading-snug mt-1">
+                    {srv.title}
+                  </h3>
+                </Link>
+
+                <p className="text-xs sm:text-[13px] text-neutral-600 leading-relaxed mt-2 line-clamp-3">
+                  {srv.summary}
+                </p>
               </div>
 
-              <div className="px-5 pb-5 pt-2 space-y-3">
-                <div className="flex items-center justify-between text-xs bg-neutral-50 rounded-xl px-3 py-2 border border-neutral-100">
-                  <span className="text-neutral-500">Referencia:</span>
-                  <span className="font-bold text-neutral-900">
-                    {srv.isCustomQuote || !srv.priceBase
-                      ? 'Cotización personalizada'
-                      : `Desde $${Number(srv.priceBase).toLocaleString('es-CL')} ${config.company.ivaLabel}`}
-                  </span>
-                </div>
+              <div className="mt-4 pt-3.5 border-t border-neutral-200/80 flex items-center justify-between gap-3">
+                <span className="text-xs font-semibold text-neutral-900">
+                  {srv.isCustomQuote || !srv.priceBase
+                    ? 'Cotización personalizada'
+                    : `Desde $${Number(srv.priceBase).toLocaleString('es-CL')} ${config.company.ivaLabel}`}
+                </span>
 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => jumpToQuoter(srv.id)}
-                    className="flex-1 bg-[#C41625] hover:bg-[#a6121f] text-white text-xs font-bold py-2.5 rounded-full transition cursor-pointer"
-                  >
-                    Solicitar cotización
-                  </button>
+                <div className="flex items-center gap-3 shrink-0">
                   <Link
                     to={srv.route}
-                    className="px-4 py-2.5 rounded-full border border-neutral-200 hover:bg-neutral-100 text-xs font-semibold text-neutral-800 transition"
+                    className="text-xs font-medium text-neutral-500 hover:text-neutral-900 transition"
                   >
                     Detalles
                   </Link>
+                  <button
+                    type="button"
+                    onClick={() => jumpToQuoter(srv.id)}
+                    className="text-xs font-semibold text-[#C41625] hover:underline cursor-pointer"
+                  >
+                    Cotizar →
+                  </button>
                 </div>
               </div>
             </article>
@@ -437,30 +424,31 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. DESTACADO ESPECIAL: DESRATIZACIÓN PRE-DEMOLICIÓN */}
-      <section className="px-4 sm:px-6 max-w-7xl mx-auto pb-8">
-        <div className="bg-[#181818] text-white rounded-[28px] p-6 sm:p-9 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-          <div className="lg:col-span-8 space-y-3">
-            <span className="inline-block text-[11px] font-bold uppercase tracking-widest text-[#ff6b78] bg-[#C41625]/20 border border-[#C41625]/35 px-3 py-1 rounded-full">
+      {/* 4. DESTACADO ESPECIAL: DESRATIZACIÓN PRE-DEMOLICIÓN — Clean Asymmetric Light Feature */}
+      <section className="px-5 sm:px-8 max-w-7xl mx-auto pb-16 sm:pb-24">
+        <div className="bg-[#F8F8F7] border-l-4 border-[#C41625] rounded-r-2xl p-7 sm:p-11 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div className="lg:col-span-8 space-y-2.5">
+            <span className="text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
               Trámite Sanitario para Permisos de Demolición
             </span>
-            <h2 className="font-editorial text-2xl sm:text-3xl font-bold leading-tight">
+            <h2 className="font-editorial text-2xl sm:text-3xl font-bold text-neutral-900 leading-tight">
               {config.preDemolition.heroTitle}
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-2xl">
+            <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed max-w-2xl">
               Realizamos inspección técnica del inmueble, evaluación de roedores, tratamiento controlado, monitoreo, emisión del certificado técnico de desratización y orientación para la visación ante la SEREMI de Salud.
             </p>
           </div>
           <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-2.5">
             <button
+              type="button"
               onClick={() => jumpToQuoter('desratizacion-pre-demolicion')}
-              className="w-full bg-[#C41625] hover:bg-[#a6121f] text-white text-xs sm:text-sm font-bold py-3 px-5 rounded-full transition cursor-pointer"
+              className="w-full bg-[#C41625] hover:bg-[#a6121f] text-white text-xs sm:text-sm font-semibold py-3 px-5 rounded-full transition cursor-pointer"
             >
               Cotizar Pre-Demolición
             </button>
             <Link
               to="/desratizacion-pre-demolicion-puerto-montt"
-              className="w-full bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs sm:text-sm font-semibold py-3 px-5 rounded-full text-center transition"
+              className="w-full border border-neutral-300 hover:border-neutral-900 text-neutral-900 text-xs sm:text-sm font-medium py-3 px-5 rounded-full text-center transition"
             >
               Ver requisitos y plazos SEREMI →
             </Link>
@@ -468,69 +456,67 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 5. EMPRESAS, INDUSTRIAS E INSTITUCIONES + 5 PLANES DIFERENCIADOS */}
-      <section id="empresas-planes" className="bg-neutral-50 border-y border-neutral-200 py-12 sm:py-16 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto space-y-12">
-          {/* Sectors Block */}
-          <div className="space-y-6">
+      {/* 5. EMPRESAS, INDUSTRIAS E INSTITUCIONES + 5 PLANES + CENTRAL MIP */}
+      <section id="empresas-planes" className="bg-[#F8F8F7] border-y border-neutral-200/80 py-16 sm:py-24 px-5 sm:px-8">
+        <div className="max-w-7xl mx-auto space-y-16 sm:space-y-20">
+          {/* 10 Sectors — Typographic Hairline Grid */}
+          <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#C41625]">
-                  <Building2 className="w-4 h-4" /> Particulares y Sector Productivo
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
+                  Particulares y Sector Productivo
                 </span>
-                <h2 className="font-editorial text-2xl sm:text-4xl font-bold text-neutral-900 mt-1">
+                <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-neutral-900 mt-1.5">
                   Soluciones para Empresas, Industrias e Instituciones
                 </h2>
-                <p className="text-xs sm:text-sm text-neutral-600 mt-1.5 max-w-2xl">
-                  Desarrollamos programas MIP continuos con inspecciones periódicas, informes técnicos, planos de estaciones y carpeta sanitaria digital en Central MIP.
+                <p className="text-sm text-neutral-600 mt-2 max-w-2xl">
+                  Programas MIP continuos con inspecciones periódicas, informes técnicos, planos de estaciones y carpeta sanitaria digital en Central MIP.
                 </p>
               </div>
               <Link
                 to="/empresas"
-                className="inline-flex items-center gap-1.5 bg-[#181818] hover:bg-neutral-800 text-white text-xs font-bold px-5 py-2.5 rounded-full transition w-fit shrink-0"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-900 hover:text-[#C41625] transition shrink-0"
               >
-                <span>Ver división empresarial</span>
+                <span>Explorar división empresarial</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-7">
               {config.industries.map((ind, idx) => (
-                <div
-                  key={idx}
-                  className="bg-white border border-neutral-200 rounded-2xl p-3.5 sm:p-4 hover:border-[#C41625]/40 transition"
-                >
-                  <p className="font-bold text-xs sm:text-sm text-neutral-900 leading-snug">{ind.name}</p>
-                  <p className="text-[11px] text-neutral-600 mt-1 leading-relaxed">{ind.desc}</p>
+                <div key={idx} className="border-t border-neutral-300/80 pt-3.5">
+                  <p className="font-semibold text-xs sm:text-sm text-neutral-900 leading-snug">{ind.name}</p>
+                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed">{ind.desc}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* 5 Plans Block */}
-          <div id="planes" className="space-y-6">
+          {/* 5 Differentiated Plans */}
+          <div id="planes" className="space-y-8">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-widest text-[#C41625]">
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
                 Planes de Control de Plagas
               </span>
-              <h2 className="font-editorial text-2xl sm:text-3xl font-bold text-neutral-900 mt-1">
-                Programas diferenciados según tu necesidad
+              <h2 className="font-editorial text-2xl sm:text-3xl font-bold text-neutral-900 mt-1.5">
+                Programas diferenciados según tu instalación
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-600 mt-1">
-                Las frecuencias y condiciones de cada plan se definen según las características de las instalaciones y evaluación técnica previa.
+              <p className="text-xs sm:text-sm text-neutral-600 mt-1.5">
+                Las frecuencias y condiciones de cada plan se definen según las características del recinto y evaluación técnica previa.
               </p>
             </div>
 
-            {/* Mobile compact selector + Desktop 5-card layout */}
-            <div className="flex overflow-x-auto gap-2 pb-1 lg:hidden">
+            {/* Mobile selector */}
+            <div className="flex overflow-x-auto gap-2 pb-1 lg:hidden no-scrollbar">
               {config.plans.map((plan, idx) => (
                 <button
                   key={plan.id}
+                  type="button"
                   onClick={() => setSelectedPlanIdx(idx)}
-                  className={`shrink-0 px-3.5 py-2 rounded-full text-xs font-bold border transition cursor-pointer ${
+                  className={`shrink-0 px-3.5 py-2 rounded-full text-xs font-medium transition cursor-pointer ${
                     selectedPlanIdx === idx
-                      ? 'bg-[#C41625] text-white border-[#C41625]'
-                      : 'bg-white text-neutral-700 border-neutral-200'
+                      ? 'bg-[#181818] text-white'
+                      : 'bg-white text-neutral-600 border border-neutral-200'
                   }`}
                 >
                   {plan.name}
@@ -542,13 +528,13 @@ export default function LandingPage() {
               {(() => {
                 const activePlan = config.plans[selectedPlanIdx] || config.plans[0];
                 return (
-                  <div className="bg-white border border-neutral-200 rounded-2xl p-5 space-y-3">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#C41625]">
+                  <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 space-y-3.5">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#C41625]">
                       {activePlan.target}
                     </span>
                     <h3 className="font-editorial text-xl font-bold text-neutral-900">{activePlan.name}</h3>
                     <p className="text-xs text-neutral-600 leading-relaxed">{activePlan.desc}</p>
-                    <ul className="space-y-1.5 pt-1">
+                    <ul className="space-y-2 pt-1">
                       {activePlan.features.map((f, fIdx) => (
                         <li key={fIdx} className="flex items-start gap-2 text-xs text-neutral-700">
                           <CheckCircle2 className="w-3.5 h-3.5 text-[#C41625] shrink-0 mt-0.5" />
@@ -557,10 +543,11 @@ export default function LandingPage() {
                       ))}
                     </ul>
                     <button
+                      type="button"
                       onClick={() =>
                         jumpToQuoter(activePlan.id === 'residencial' ? 'desinsectacion' : 'programas-preventivos')
                       }
-                      className="w-full bg-[#181818] text-white text-xs font-bold py-2.5 rounded-full cursor-pointer"
+                      className="w-full bg-[#181818] text-white text-xs font-semibold py-3 rounded-full cursor-pointer"
                     >
                       {activePlan.ctaText}
                     </button>
@@ -569,21 +556,22 @@ export default function LandingPage() {
               })()}
             </div>
 
-            <div className="hidden lg:grid lg:grid-cols-5 gap-3.5">
+            {/* Desktop 5-Column Clean Cards */}
+            <div className="hidden lg:grid lg:grid-cols-5 gap-4">
               {config.plans.map((plan) => (
                 <div
                   key={plan.id}
-                  className="bg-white border border-neutral-200 rounded-2xl p-5 flex flex-col justify-between hover:border-[#C41625]/40 hover:shadow-md transition"
+                  className="bg-white border border-neutral-200/80 rounded-2xl p-5 flex flex-col justify-between hover:border-neutral-400 transition"
                 >
-                  <div className="space-y-2.5">
-                    <span className="inline-block text-[10px] font-bold uppercase tracking-wider text-[#C41625] bg-[#C41625]/10 px-2.5 py-0.5 rounded-full">
+                  <div className="space-y-3">
+                    <span className="block text-[10px] font-semibold uppercase tracking-wider text-[#C41625]">
                       {plan.target}
                     </span>
                     <h3 className="font-editorial text-lg font-bold text-neutral-900 leading-snug">{plan.name}</h3>
-                    <p className="text-xs text-neutral-600 leading-relaxed">{plan.desc}</p>
-                    <ul className="space-y-1.5 pt-1">
+                    <p className="text-xs text-neutral-500 leading-relaxed">{plan.desc}</p>
+                    <ul className="space-y-2 pt-2 border-t border-neutral-100">
                       {plan.features.map((f, fIdx) => (
-                        <li key={fIdx} className="flex items-start gap-1.5 text-[11px] text-neutral-700">
+                        <li key={fIdx} className="flex items-start gap-1.5 text-[11.5px] text-neutral-700 leading-snug">
                           <CheckCircle2 className="w-3.5 h-3.5 text-[#C41625] shrink-0 mt-0.5" />
                           <span>{f}</span>
                         </li>
@@ -592,10 +580,11 @@ export default function LandingPage() {
                   </div>
 
                   <button
+                    type="button"
                     onClick={() =>
                       jumpToQuoter(plan.id === 'residencial' ? 'desinsectacion' : 'programas-preventivos')
                     }
-                    className="mt-5 w-full bg-[#181818] hover:bg-[#C41625] text-white text-xs font-bold py-2.5 rounded-full transition cursor-pointer"
+                    className="mt-6 w-full border border-neutral-300 hover:bg-[#181818] hover:text-white hover:border-[#181818] text-neutral-900 text-xs font-semibold py-2.5 rounded-full transition cursor-pointer"
                   >
                     {plan.ctaText}
                   </button>
@@ -604,69 +593,70 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Central MIP Client Portal Spotlight */}
-          <div className="bg-[#181818] text-white rounded-[24px] p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="space-y-2 max-w-2xl">
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#ff6b78]">
-                <Lock className="w-4 h-4" /> Portal Exclusivo Central MIP
+          {/* Central MIP Portal — Clean Horizontal Row */}
+          <div className="pt-8 border-t border-neutral-200 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-1.5 max-w-2xl">
+              <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C41625]">
+                <Lock className="w-3.5 h-3.5" /> Portal Central MIP
               </div>
-              <h3 className="font-editorial text-2xl font-bold">
-                Acceso Clientes: certificados, planos e informes técnicos en línea
+              <h3 className="font-editorial text-2xl font-bold text-neutral-900">
+                Acceso Clientes: certificados, planos e informes técnicos
               </h3>
-              <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
-                Sin plataformas paralelas ni registros duplicados: ingresa con tus credenciales a Central MIP para consultar calendarios de visitas, fotografías en terreno, estaciones cebaderas y hojas de seguridad.
+              <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed">
+                Ingresa con tus credenciales al portal seguro de Central MIP para revisar calendarios de visitas, fotografías en terreno, estaciones cebaderas y hojas de seguridad.
               </p>
             </div>
             <button
+              type="button"
               onClick={() => {
                 trackClientPortalClick('home_banner');
                 setCentralMipModalOpen(true);
               }}
-              className="inline-flex items-center justify-center gap-2 bg-[#C41625] hover:bg-[#a6121f] text-white text-xs sm:text-sm font-bold px-6 py-3.5 rounded-full transition cursor-pointer shrink-0"
+              className="inline-flex items-center justify-center gap-2 bg-[#181818] hover:bg-neutral-800 text-white text-xs sm:text-sm font-semibold px-6 py-3 rounded-full transition cursor-pointer shrink-0 w-fit"
             >
-              <Lock className="w-4 h-4" />
+              <Lock className="w-3.5 h-3.5 text-[#ff8690]" />
               <span>Abrir Acceso Clientes</span>
             </button>
           </div>
         </div>
       </section>
 
-      {/* 6. NUESTRO PROCEDIMIENTO DE TRABAJO (6 PASOS) */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6 max-w-7xl mx-auto">
-        <div className="text-center max-w-2xl mx-auto mb-8">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-[#C41625]">
-            Metodología Clara y Trazable
+      {/* 6. PROCEDIMIENTO DE TRABAJO — Numbered Typographic Grid */}
+      <section className="py-16 sm:py-24 px-5 sm:px-8 max-w-7xl mx-auto">
+        <div className="max-w-xl mb-12">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
+            Metodología de Atención
           </span>
-          <h2 className="font-editorial text-2xl sm:text-4xl font-bold text-neutral-900 mt-1">
+          <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-neutral-900 mt-1.5">
             ¿Cómo trabajamos en cada servicio?
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
           {config.workflowSteps.map((step) => (
-            <div key={step.num} className="bg-white border border-neutral-200 rounded-2xl p-5 space-y-2">
-              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#181818] text-white text-xs font-bold">
+            <div key={step.num} className="border-t border-neutral-200 pt-5 space-y-2">
+              <span className="font-editorial text-2xl font-bold text-neutral-300 block">
                 {step.num}
               </span>
-              <h3 className="font-bold text-sm text-neutral-900">{step.title}</h3>
-              <p className="text-xs text-neutral-600 leading-relaxed">{step.desc}</p>
+              <h3 className="font-semibold text-sm sm:text-base text-neutral-900">{step.title}</h3>
+              <p className="text-xs sm:text-[13px] text-neutral-600 leading-relaxed">{step.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 7. GALERÍA DE TRABAJOS REALIZADOS (Escalable desde Admin) */}
-      <section id="trabajos" className="bg-neutral-50 border-y border-neutral-200 py-12 sm:py-16 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto space-y-6">
+      {/* 7. GALERÍA DE TRABAJOS REALIZADOS — Clean Photo Grid */}
+      <section id="trabajos" className="bg-[#F8F8F7] border-y border-neutral-200/80 py-16 sm:py-24 px-5 sm:px-8">
+        <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#C41625]">
-                <Camera className="w-4 h-4" /> Registro en Terreno
+              <span className="text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
+                Registro en Terreno
               </span>
-              <h2 className="font-editorial text-2xl sm:text-4xl font-bold text-neutral-900 mt-1">
+              <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-neutral-900 mt-1.5">
                 Galería de Trabajos Realizados
               </h2>
-              <p className="text-xs sm:text-sm text-neutral-600 mt-1.5 max-w-2xl">
+              <p className="text-xs sm:text-sm text-neutral-600 mt-2 max-w-2xl">
                 Registro progresivo de instalaciones de estaciones cebaderas, desratizaciones, desinsectaciones y sanitizaciones en la Región de Los Lagos, resguardando siempre los datos privados de cada cliente.
               </p>
             </div>
@@ -675,11 +665,12 @@ export default function LandingPage() {
               {galleryCategories.map((cat) => (
                 <button
                   key={cat}
+                  type="button"
                   onClick={() => setGalleryFilter(cat)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition cursor-pointer ${
                     galleryFilter === cat
-                      ? 'bg-[#181818] text-white border-[#181818]'
-                      : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-100'
+                      ? 'bg-[#181818] text-white'
+                      : 'bg-white text-neutral-600 border border-neutral-200 hover:border-neutral-400'
                   }`}
                 >
                   {cat}
@@ -688,28 +679,25 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
             {filteredGallery.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white border border-neutral-200 rounded-2xl overflow-hidden hover:shadow-md transition"
-              >
-                <div className="aspect-[16/10] overflow-hidden bg-neutral-100 relative">
+              <div key={item.id} className="group space-y-3">
+                <div className="aspect-[16/10] rounded-2xl overflow-hidden bg-neutral-200">
                   <img
                     src={item.image}
                     alt={`${item.title} - ${item.location}`}
-                    className="w-full h-full object-cover hover:scale-105 transition duration-500"
+                    className="w-full h-full object-cover group-hover:scale-[1.03] transition duration-500"
                   />
-                  <span className="absolute top-2.5 left-2.5 bg-black/75 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
-                    {item.category}
-                  </span>
                 </div>
-                <div className="p-4 space-y-1">
-                  <h3 className="font-bold text-sm text-neutral-900">{item.title}</h3>
-                  <p className="inline-flex items-center gap-1 text-[11px] font-medium text-[#C41625]">
-                    <MapPin className="w-3 h-3" /> {item.location}
-                  </p>
-                  <p className="text-xs text-neutral-600 leading-relaxed pt-1">{item.caption}</p>
+                <div className="space-y-1 px-0.5">
+                  <div className="flex items-center justify-between gap-2 text-[11px]">
+                    <span className="font-semibold uppercase tracking-wider text-[#C41625]">{item.category}</span>
+                    <span className="inline-flex items-center gap-1 text-neutral-500">
+                      <MapPin className="w-3 h-3" /> {item.location}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold text-sm text-neutral-900">{item.title}</h3>
+                  <p className="text-xs text-neutral-600 leading-relaxed">{item.caption}</p>
                 </div>
               </div>
             ))}
@@ -720,17 +708,17 @@ export default function LandingPage() {
       {/* 8. DOCUMENTACIÓN TÉCNICA Y CERTIFICADOS */}
       <DocumentsSection />
 
-      {/* 9. COBERTURA TERRITORIAL Y MAPA INTERACTIVO */}
-      <section id="zonas" className="bg-neutral-50 border-y border-neutral-200 py-12 sm:py-16 px-4 sm:px-6">
-        <div className="max-w-7xl mx-auto space-y-6">
+      {/* 9. COBERTURA TERRITORIAL Y GOOGLE MAPS */}
+      <section id="zonas" className="bg-[#F8F8F7] border-y border-neutral-200/80 py-16 sm:py-24 px-5 sm:px-8">
+        <div className="max-w-7xl mx-auto space-y-8">
           <div>
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#C41625]">
-              <MapPin className="w-4 h-4" /> Región de Los Lagos y Sur de Chile
+            <span className="text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
+              Región de Los Lagos y Sur de Chile
             </span>
-            <h2 className="font-editorial text-2xl sm:text-4xl font-bold text-neutral-900 mt-1">
-              Cobertura Territorial en la Región de Los Lagos
+            <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-neutral-900 mt-1.5">
+              Cobertura Territorial
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 mt-1.5 max-w-2xl">
+            <p className="text-xs sm:text-sm text-neutral-600 mt-2 max-w-2xl">
               Atendemos en Puerto Montt, Alerce, Puerto Varas, Llanquihue, Frutillar, Calbuco, Los Muermos, Maullín, Osorno, Río Negro, Ancud, Castro y otras zonas del sur de Chile previa coordinación.
             </p>
           </div>
@@ -743,14 +731,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 10. OPINIONES, RESEÑAS Y PERFIL DE EMPRESA EN GOOGLE */}
-      <section id="resenas" className="py-12 sm:py-16 px-4 sm:px-6 max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-7">
+      {/* 10. OPINIONES Y RESEÑAS EN GOOGLE */}
+      <section id="resenas" className="py-16 sm:py-20 px-5 sm:px-8 max-w-6xl mx-auto">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
           <div>
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#C41625]">
-              <Star className="w-4 h-4 fill-[#C41625]" /> Opiniones de Clientes
+            <span className="text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
+              Opiniones de Clientes
             </span>
-            <h2 className="font-editorial text-2xl sm:text-4xl font-bold text-neutral-900 mt-1">
+            <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-neutral-900 mt-1.5">
               Reseñas y Perfil de Empresa en Google
             </h2>
           </div>
@@ -760,40 +748,37 @@ export default function LandingPage() {
               href={config.company.googleProfileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#181818] hover:bg-neutral-800 text-white text-xs font-bold px-5 py-2.5 rounded-full transition w-fit"
+              className="inline-flex items-center gap-2 border border-neutral-300 hover:border-neutral-900 text-neutral-900 text-xs font-semibold px-5 py-2.5 rounded-full transition w-fit"
             >
               <span>Ver reseñas o evaluar en Google</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           ) : (
-            <span className="inline-flex items-center gap-1.5 text-xs text-neutral-500 bg-neutral-100 border border-neutral-200 px-3.5 py-2 rounded-full">
-              <FileCheck2 className="w-3.5 h-3.5 text-[#C41625]" />
-              Enlace a Google Perfil configurable desde Admin
+            <span className="text-xs text-neutral-500">
+              Enlace a Google Perfil configurable desde Administración
             </span>
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {config.reviews.map((rev) => (
-            <div key={rev.id} className="bg-white border border-neutral-200 rounded-2xl p-5 space-y-2.5">
-              <div className="flex items-center gap-1 text-amber-500">
+            <blockquote key={rev.id} className="border-l-2 border-neutral-200 pl-5 space-y-3">
+              <div className="flex items-center gap-1">
                 {Array.from({ length: rev.rating || 5 }).map((_, sIdx) => (
-                  <Star key={sIdx} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  <Star key={sIdx} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                 ))}
               </div>
-              <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed">“{rev.text}”</p>
-              <div className="pt-2 border-t border-neutral-100 flex items-center justify-between text-xs">
+              <p className="text-sm text-neutral-700 leading-relaxed">“{rev.text}”</p>
+              <footer className="flex items-center justify-between text-xs pt-1">
                 <div>
-                  <p className="font-bold text-neutral-900">{rev.author}</p>
+                  <p className="font-semibold text-neutral-900">{rev.author}</p>
                   <p className="text-[11px] text-neutral-500">{rev.sector}</p>
                 </div>
                 {rev.verifiedPlaceholder && (
-                  <span className="text-[10px] bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded-full">
-                    Espacio administrable
-                  </span>
+                  <span className="text-[10px] text-neutral-400">Administrable</span>
                 )}
-              </div>
-            </div>
+              </footer>
+            </blockquote>
           ))}
         </div>
       </section>
@@ -801,32 +786,36 @@ export default function LandingPage() {
       {/* 11. COTIZADOR EN LÍNEA COMPLETO */}
       <QuoterSection preselectedComuna={selectedComuna} preselectedComunaTick={comunaTick} />
 
-      {/* 12. PREGUNTAS FRECUENTES (Técnicamente Verificadas) */}
-      <section id="faq" className="py-12 px-4 sm:px-6 max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <span className="text-[11px] font-bold uppercase tracking-widest text-[#C41625]">
+      {/* 12. PREGUNTAS FRECUENTES — Clean Hairline Accordion */}
+      <section id="faq" className="py-16 sm:py-20 px-5 sm:px-8 max-w-4xl mx-auto">
+        <div className="mb-10">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
             Información Técnica Transparente
           </span>
-          <h2 className="font-editorial text-2xl sm:text-4xl font-bold text-neutral-900 mt-1">
+          <h2 className="font-editorial text-3xl sm:text-4xl font-bold text-neutral-900 mt-1.5">
             Preguntas Frecuentes
           </h2>
         </div>
 
-        <div className="space-y-3">
+        <div className="divide-y divide-neutral-200 border-y border-neutral-200">
           {config.faqs.map((item, idx) => {
             const isOpen = openFaqIdx === idx;
             return (
-              <div key={idx} className="bg-white border border-neutral-200 rounded-2xl overflow-hidden">
+              <div key={idx}>
                 <button
                   type="button"
                   onClick={() => setOpenFaqIdx(isOpen ? -1 : idx)}
-                  className="w-full px-5 py-4 flex items-center justify-between gap-3 text-left font-bold text-xs sm:text-sm text-neutral-900 hover:bg-neutral-50 transition cursor-pointer"
+                  className="w-full py-5 flex items-center justify-between gap-4 text-left font-semibold text-sm sm:text-base text-neutral-900 hover:text-[#C41625] transition cursor-pointer"
                 >
                   <span>{item.q}</span>
-                  <ChevronDown className={`w-4 h-4 shrink-0 transition ${isOpen ? 'rotate-180 text-[#C41625]' : ''}`} />
+                  <ChevronDown
+                    className={`w-4 h-4 shrink-0 text-neutral-400 transition-transform ${
+                      isOpen ? 'rotate-180 text-[#C41625]' : ''
+                    }`}
+                  />
                 </button>
                 {isOpen && (
-                  <div className="px-5 pb-4 pt-1 text-xs sm:text-sm text-neutral-600 leading-relaxed border-t border-neutral-100">
+                  <div className="pb-5 text-xs sm:text-sm text-neutral-600 leading-relaxed pr-8">
                     {item.a}
                   </div>
                 )}

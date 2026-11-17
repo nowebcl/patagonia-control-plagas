@@ -52,47 +52,52 @@ export default function CompaniesPage() {
         </div>
 
         {/* Hero Section */}
-        <section className="bg-[#181818] text-white rounded-[28px] p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <section className="pt-4 pb-8 border-b border-neutral-200/80 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <div className="lg:col-span-7 space-y-5">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#ff6b78]">
-              <Building2 className="w-4 h-4" /> Programas MIP & Continuidad Operacional
-            </span>
-            <h1 className="font-editorial text-3xl sm:text-4xl font-bold leading-tight">
+            <div className="space-y-2.5">
+              <div className="w-10 h-[2px] bg-[#C41625]" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-neutral-500">
+                <Building2 className="w-4 h-4 text-[#C41625]" /> Programas MIP y Continuidad Operacional
+              </span>
+            </div>
+            <h1 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-bold leading-[1.14] text-neutral-900">
               Soluciones de control de plagas para empresas, industrias e instituciones
             </h1>
-            <p className="text-neutral-300 text-sm sm:text-base leading-relaxed">
+            <p className="text-neutral-600 text-sm sm:text-base leading-relaxed">
               Además de atender hogares particulares, diseñamos y ejecutamos programas periódicos de Manejo Integrado de Plagas (MIP) con inspecciones técnicas, monitoreo de estaciones cebaderas, planos, certificados e informes trazables para fiscalizaciones sanitarias.
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 pt-1">
               <button
+                type="button"
                 onClick={() => handleSelectPlanQuote('programas-preventivos')}
-                className="inline-flex items-center gap-2 bg-[#C41625] hover:bg-[#a6121f] text-white text-xs sm:text-sm font-bold px-6 py-3.5 rounded-full transition cursor-pointer"
+                className="inline-flex items-center gap-2 bg-[#C41625] hover:bg-[#a6121f] text-white text-xs sm:text-sm font-semibold px-6 py-3 rounded-full transition cursor-pointer"
               >
                 <Calculator className="w-4 h-4" />
                 <span>Solicitar propuesta empresarial</span>
               </button>
               <button
+                type="button"
                 onClick={() => {
                   trackClientPortalClick('companies_hero');
                   setCentralMipModalOpen(true);
                 }}
-                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs sm:text-sm font-semibold px-6 py-3.5 rounded-full transition cursor-pointer"
+                className="inline-flex items-center gap-2 border border-neutral-300 hover:border-neutral-900 text-neutral-900 text-xs sm:text-sm font-medium px-6 py-3 rounded-full transition cursor-pointer"
               >
-                <Lock className="w-4 h-4 text-[#ff6b78]" />
+                <Lock className="w-3.5 h-3.5 text-[#C41625]" />
                 <span>Acceso Clientes (Central MIP)</span>
               </button>
             </div>
           </div>
 
-          <div className="lg:col-span-5 bg-white/5 border border-white/10 rounded-2xl p-5 space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-[#ff6b78] uppercase tracking-wider">
+          <div className="lg:col-span-5 bg-[#F8F8F7] border border-neutral-200/80 rounded-2xl p-6 space-y-2.5">
+            <div className="flex items-center gap-2 text-[11px] font-semibold text-[#C41625] uppercase tracking-wider">
               <ShieldCheck className="w-4 h-4" /> Respaldo Técnico Normativo
             </div>
-            <p className="text-sm font-semibold text-white">{config.company.legalName}</p>
-            <p className="text-xs text-neutral-300">{config.company.rexSanitaria}</p>
-            <p className="text-xs text-neutral-300">{config.company.rexModificacion}</p>
-            <p className="text-xs text-neutral-400">
-              Director Técnico: <span className="text-white">{config.company.technicalDirector}</span> ({config.company.technicalDirectorRole.replace(' — Director Técnico', '')})
+            <p className="text-sm font-semibold text-neutral-900">{config.company.legalName}</p>
+            <p className="text-xs text-neutral-600">{config.company.rexSanitaria}</p>
+            <p className="text-xs text-neutral-600">{config.company.rexModificacion}</p>
+            <p className="text-xs text-neutral-500 pt-1 border-t border-neutral-200">
+              Director Técnico: <span className="text-neutral-900 font-medium">{config.company.technicalDirector}</span> ({config.company.technicalDirectorRole.replace(' — Director Técnico', '')})
             </p>
           </div>
         </section>
@@ -108,14 +113,14 @@ export default function CompaniesPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-7">
             {config.industries.map((ind, idx) => (
               <div
                 key={idx}
-                className="bg-white border border-neutral-200 rounded-2xl p-4 space-y-1.5 hover:border-[#C41625]/40 transition"
+                className="border-t border-neutral-200 pt-3.5 space-y-1.5"
               >
-                <span className="text-[10px] font-bold text-[#C41625]">{String(idx + 1).padStart(2, '0')}</span>
-                <h3 className="font-bold text-sm text-neutral-900">{ind.name}</h3>
+                <span className="text-[10px] font-semibold text-[#C41625]">{String(idx + 1).padStart(2, '0')}</span>
+                <h3 className="font-semibold text-sm text-neutral-900">{ind.name}</h3>
                 <p className="text-xs text-neutral-600 leading-relaxed">{ind.desc}</p>
               </div>
             ))}

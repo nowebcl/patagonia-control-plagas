@@ -66,25 +66,29 @@ export default function PreDemolitionPage() {
         </div>
 
         {/* Hero */}
-        <section className="bg-[#181818] text-white rounded-[28px] p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <section className="pt-4 pb-6 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center border-b border-neutral-200/80">
           <div className="lg:col-span-7 space-y-5">
-            <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[#ff6b78] bg-[#C41625]/20 border border-[#C41625]/40 px-3 py-1 rounded-full">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              {company.rexSanitaria} · {company.rexModificacion}
+            <div className="space-y-2.5">
+              <div className="w-10 h-[2px] bg-[#C41625]" />
+              <div className="inline-flex items-center gap-2 text-xs font-medium text-neutral-500">
+                <ShieldCheck className="w-4 h-4 text-[#C41625]" />
+                <span>{company.rexSanitaria} · {company.rexModificacion}</span>
+              </div>
             </div>
 
-            <h1 className="font-editorial text-3xl sm:text-4xl lg:text-[2.6rem] font-bold leading-tight">
+            <h1 className="font-editorial text-3xl sm:text-4xl lg:text-[2.75rem] font-bold leading-[1.14] text-neutral-900">
               {preDemolition.heroTitle}
             </h1>
 
-            <p className="text-neutral-300 text-sm sm:text-base leading-relaxed">
+            <p className="text-neutral-600 text-sm sm:text-base leading-relaxed">
               {preDemolition.heroSubtitle}
             </p>
 
             <div className="flex flex-wrap gap-3 pt-1">
               <button
+                type="button"
                 onClick={handleQuotePreDemo}
-                className="inline-flex items-center gap-2 bg-[#C41625] hover:bg-[#a6121f] text-white text-xs sm:text-sm font-bold px-6 py-3.5 rounded-full shadow-lg transition cursor-pointer"
+                className="inline-flex items-center gap-2 bg-[#C41625] hover:bg-[#a6121f] text-white text-xs sm:text-sm font-semibold px-6 py-3 rounded-full transition cursor-pointer"
               >
                 <Calculator className="w-4 h-4" />
                 <span>Solicitar cotización Pre-Demolición</span>
@@ -97,16 +101,16 @@ export default function PreDemolitionPage() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackWhatsAppClick('predemolition_hero')}
-                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs sm:text-sm font-semibold px-6 py-3.5 rounded-full transition"
+                className="inline-flex items-center gap-2 border border-neutral-300 hover:border-neutral-900 text-neutral-900 text-xs sm:text-sm font-medium px-6 py-3 rounded-full transition"
               >
-                <MessageCircle className="w-4 h-4 text-[#25D366]" />
+                <MessageCircle className="w-4 h-4 text-emerald-600" />
                 <span>Consultar por WhatsApp</span>
               </a>
             </div>
           </div>
 
           <div className="lg:col-span-5">
-            <div className="rounded-2xl overflow-hidden border border-white/15 aspect-[4/3]">
+            <div className="rounded-2xl overflow-hidden border border-neutral-200/80 aspect-[4/3]">
               <img
                 src="/service-desratizacion.jpg"
                 alt="Desratización Pre-Demolición y Certificado Sanitario en Puerto Montt"
@@ -117,7 +121,7 @@ export default function PreDemolitionPage() {
         </section>
 
         {/* Types of properties covered */}
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <section className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {[
             {
               title: 'Viviendas y Sitios Urbanos',
@@ -132,9 +136,9 @@ export default function PreDemolitionPage() {
               desc: 'Galpones, plantas productivas, estructuras pesqueras/acuícolas y faenas de desarme.'
             }
           ].map((item, idx) => (
-            <div key={idx} className="bg-white rounded-2xl border border-neutral-200 p-5 space-y-2">
-              <Building2 className="w-5 h-5 text-[#C41625]" />
-              <h2 className="font-bold text-sm text-neutral-900">{item.title}</h2>
+            <div key={idx} className="border-t border-neutral-200 pt-4 space-y-1.5">
+              <Building2 className="w-4 h-4 text-[#C41625]" />
+              <h2 className="font-semibold text-sm text-neutral-900">{item.title}</h2>
               <p className="text-xs text-neutral-600 leading-relaxed">{item.desc}</p>
             </div>
           ))}

@@ -171,22 +171,22 @@ export default function ServiceDetailPage() {
 
           {/* Right Column: Sanitary Backing & Central MIP */}
           <div className="lg:col-span-5 space-y-5">
-            <div className="bg-[#181818] text-white rounded-[24px] p-6 space-y-3">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#ff6b78]">
+            <div className="bg-[#F8F8F7] border border-neutral-200/80 rounded-2xl p-6 space-y-3">
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-[#C41625]">
                 <ShieldCheck className="w-4 h-4" /> Autorización Sanitaria Vigente
               </span>
-              <h3 className="font-editorial text-xl font-bold">{config.company.brandName}</h3>
-              <p className="text-xs text-neutral-300 leading-relaxed">{config.company.legalName}</p>
-              <div className="bg-white/5 border border-white/10 rounded-xl p-3.5 text-xs space-y-1 text-neutral-200">
-                <p className="font-semibold text-white">{config.company.rexSanitaria}</p>
+              <h3 className="font-editorial text-xl font-bold text-neutral-900">{config.company.brandName}</h3>
+              <p className="text-xs text-neutral-600 leading-relaxed">{config.company.legalName}</p>
+              <div className="border-t border-neutral-200 pt-3 text-xs space-y-1 text-neutral-600">
+                <p className="font-semibold text-neutral-900">{config.company.rexSanitaria}</p>
                 <p>{config.company.rexModificacion}</p>
-                <p className="text-neutral-400">
-                  Director Técnico: <strong className="text-white">{config.company.technicalDirector}</strong>
+                <p className="text-neutral-500">
+                  Director Técnico: <strong className="text-neutral-900">{config.company.technicalDirector}</strong>
                 </p>
               </div>
             </div>
 
-            <div className="bg-neutral-50 border border-neutral-200 rounded-[24px] p-6 space-y-3">
+            <div className="bg-white border border-neutral-200/80 rounded-2xl p-6 space-y-3">
               <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
                 Documentación Digital
               </p>

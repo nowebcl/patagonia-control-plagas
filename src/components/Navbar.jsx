@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, Lock, PhoneCall, X, ArrowRight, ShieldCheck } from 'lucide-react';
+import { ChevronDown, Lock, PhoneCall, X, ArrowRight } from 'lucide-react';
 import { useSiteContent } from '../context/SiteContentContext';
 import { trackClientPortalClick } from '../utils/analytics';
 
@@ -8,6 +8,7 @@ export default function Navbar() {
   const { config, setCentralMipModalOpen } = useSiteContent();
   const [menuOpen, setMenuOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
+  const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function Navbar() {
   const handleHashNav = (hashId) => {
     setMenuOpen(false);
     setServicesDropdownOpen(false);
+    setMoreDropdownOpen(false);
     if (location.pathname !== '/') {
       navigate('/', { state: { scrollTo: hashId } });
     } else {
@@ -30,53 +32,23 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="bg-[#181818] text-white rounded-b-[20px] md:rounded-none sticky top-0 z-40 shadow-md border-b border-white/10">
-        {/* Top micro utility bar (desktop) */}
-        <div className="hidden lg:block bg-[#111111] border-b border-white/10 text-[11px] text-neutral-300">
-          <div className="max-w-7xl mx-auto px-6 py-1.5 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <span className="inline-flex items-center gap-1.5 text-white font-medium">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#ff6b78]" />
-                {config.company.rexSanitaria} · {config.company.rexModificacion}
-              </span>
-            </div>
-            <div className="flex items-center gap-5">
-              <button onClick={() => handleHashNav('respaldo-sanitario')} className="hover:text-white transition cursor-pointer">
-                Certificados y Respaldo Sanitario
-              </button>
-              <button onClick={() => handleHashNav('trabajos')} className="hover:text-white transition cursor-pointer">
-                Nuestros Trabajos
-              </button>
-              <button onClick={() => handleHashNav('zonas')} className="hover:text-white transition cursor-pointer">
-                Cobertura
-              </button>
-              <button onClick={() => handleHashNav('faq')} className="hover:text-white transition cursor-pointer">
-                Preguntas Frecuentes
-              </button>
-              <button onClick={() => handleHashNav('contacto')} className="hover:text-white transition cursor-pointer">
-                Contacto
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Navigation Bar */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 md:py-3.5 flex items-center justify-between gap-3">
-          <Link to="/" className="flex items-center gap-2.5 focus:outline-none shrink-0">
+      <header className="bg-[#181818]/98 backdrop-blur-md text-white sticky top-0 z-40 border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 h-16 md:h-[72px] flex items-center justify-between gap-4">
+          <Link to="/" className="flex items-center gap-3 focus:outline-none shrink-0">
             <img
               src="/logo-patagonia.png"
               alt={config.company.brandName}
-              className="h-9 sm:h-11 md:h-12 w-auto object-contain"
+              className="h-9 sm:h-10 md:h-11 w-auto object-contain"
             />
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-4 xl:gap-5 text-[13px] text-neutral-200 font-medium">
+          {/* Desktop Single-Row Minimal Navigation */}
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-6 text-[13px] text-neutral-300 font-medium">
             <Link
               to="/"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className={`hover:text-white transition whitespace-nowrap ${
-                location.pathname === '/' ? 'text-white font-semibold' : ''
+                location.pathname === '/' ? 'text-white' : ''
               }`}
             >
               Inicio
@@ -89,28 +61,26 @@ export default function Navbar() {
               onMouseLeave={() => setServicesDropdownOpen(false)}
             >
               <button
+                type="button"
                 onClick={() => setServicesDropdownOpen((p) => !p)}
-                className="inline-flex items-center gap-1 hover:text-white transition cursor-pointer whitespace-nowrap py-1"
+                className="inline-flex items-center gap-1 hover:text-white transition cursor-pointer whitespace-nowrap py-2"
               >
                 <span>Servicios</span>
-                <ChevronDown className="w-3.5 h-3.5" />
+                <ChevronDown className="w-3.5 h-3.5 opacity-70" />
               </button>
 
               {servicesDropdownOpen && (
-                <div className="absolute left-0 top-full pt-2 w-80 z-50">
-                  <div className="bg-white text-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 p-2.5 space-y-0.5">
-                    <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-400">
-                      Todos nuestros servicios
-                    </div>
+                <div className="absolute left-0 top-full pt-1.5 w-80 z-50">
+                  <div className="bg-white text-neutral-900 rounded-2xl shadow-xl border border-neutral-200/80 p-2 space-y-0.5">
                     {config.services.map((srv) => (
                       <Link
                         key={srv.id}
                         to={srv.route}
                         onClick={() => setServicesDropdownOpen(false)}
-                        className="flex items-center justify-between px-3 py-2 rounded-xl hover:bg-neutral-100 text-xs font-medium text-neutral-800 hover:text-[#C41625] transition"
+                        className="flex items-center justify-between px-3.5 py-2 rounded-xl hover:bg-neutral-50 text-xs font-medium text-neutral-700 hover:text-[#C41625] transition"
                       >
                         <span className="truncate pr-2">{srv.title}</span>
-                        <ArrowRight className="w-3 h-3 shrink-0 opacity-50" />
+                        <ArrowRight className="w-3 h-3 shrink-0 opacity-40" />
                       </Link>
                     ))}
                   </div>
@@ -121,77 +91,144 @@ export default function Navbar() {
             <Link
               to="/empresas"
               className={`hover:text-white transition whitespace-nowrap ${
-                location.pathname === '/empresas' ? 'text-white font-semibold' : ''
+                location.pathname === '/empresas' ? 'text-white' : ''
               }`}
             >
-              Soluciones para Empresas
+              Empresas
             </Link>
 
             <Link
               to="/desratizacion-pre-demolicion-puerto-montt"
               className={`hover:text-white transition whitespace-nowrap ${
                 location.pathname === '/desratizacion-pre-demolicion-puerto-montt'
-                  ? 'text-[#ff6b78] font-semibold'
-                  : 'text-neutral-200'
+                  ? 'text-[#ff8690]'
+                  : ''
               }`}
             >
-              Desratización Pre-Demolición
+              Pre-Demolición
             </Link>
 
             <button
-              onClick={() => handleHashNav('cotizador')}
+              type="button"
+              onClick={() => handleHashNav('trabajos')}
               className="hover:text-white transition cursor-pointer whitespace-nowrap"
             >
-              Cotizador
+              Trabajos
             </button>
 
             <button
-              onClick={handleClientPortal}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white transition cursor-pointer whitespace-nowrap"
+              type="button"
+              onClick={() => handleHashNav('zonas')}
+              className="hover:text-white transition cursor-pointer whitespace-nowrap"
             >
-              <Lock className="w-3.5 h-3.5 text-[#ff6b78]" />
-              <span>Acceso Clientes</span>
+              Cobertura
             </button>
 
-            <button
-              onClick={() => handleHashNav('cotizador')}
-              className="bg-[#C41625] hover:bg-[#a6121f] text-white text-xs font-semibold px-4 py-2 rounded-full transition cursor-pointer shadow-sm whitespace-nowrap"
+            {/* Dropdown Respaldo & Info */}
+            <div
+              className="relative"
+              onMouseEnter={() => setMoreDropdownOpen(true)}
+              onMouseLeave={() => setMoreDropdownOpen(false)}
             >
-              Cotizar ahora
-            </button>
+              <button
+                type="button"
+                onClick={() => setMoreDropdownOpen((p) => !p)}
+                className="inline-flex items-center gap-1 hover:text-white transition cursor-pointer whitespace-nowrap py-2"
+              >
+                <span>Respaldo</span>
+                <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+              </button>
+
+              {moreDropdownOpen && (
+                <div className="absolute right-0 top-full pt-1.5 w-64 z-50">
+                  <div className="bg-white text-neutral-900 rounded-2xl shadow-xl border border-neutral-200/80 p-2 space-y-0.5">
+                    <button
+                      type="button"
+                      onClick={() => handleHashNav('respaldo-sanitario')}
+                      className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-neutral-50 text-xs font-medium text-neutral-700 hover:text-[#C41625] transition cursor-pointer"
+                    >
+                      Autorización Sanitaria SEREMI
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleHashNav('documentacion')}
+                      className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-neutral-50 text-xs font-medium text-neutral-700 hover:text-[#C41625] transition cursor-pointer"
+                    >
+                      Certificados y Documentación
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleHashNav('faq')}
+                      className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-neutral-50 text-xs font-medium text-neutral-700 hover:text-[#C41625] transition cursor-pointer"
+                    >
+                      Preguntas Frecuentes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleHashNav('contacto')}
+                      className="w-full text-left px-3.5 py-2 rounded-xl hover:bg-neutral-50 text-xs font-medium text-neutral-700 hover:text-[#C41625] transition cursor-pointer"
+                    >
+                      Contacto Directo
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2.5 pl-2 border-l border-white/15">
+              <button
+                type="button"
+                onClick={handleClientPortal}
+                className="inline-flex items-center gap-1.5 text-xs font-medium px-3.5 py-2 rounded-full border border-white/20 hover:border-white/40 text-white transition cursor-pointer whitespace-nowrap"
+              >
+                <Lock className="w-3 h-3 text-[#ff8690]" />
+                <span>Acceso Clientes</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleHashNav('cotizador')}
+                className="bg-[#C41625] hover:bg-[#a6121f] text-white text-xs font-semibold px-4 py-2 rounded-full transition cursor-pointer whitespace-nowrap"
+              >
+                Cotizador
+              </button>
+            </div>
           </nav>
 
-          {/* Tablet/Mobile Quick Actions + Menu Button */}
-          <div className="flex lg:hidden items-center gap-2">
+          {/* Mobile Quick Actions + Minimal Menu Trigger */}
+          <div className="flex lg:hidden items-center gap-2.5">
             <button
+              type="button"
               onClick={handleClientPortal}
-              className="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 border border-white/15 text-white text-[11px] font-semibold px-2.5 py-1.5 rounded-full transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 border border-white/20 text-white text-[11px] font-medium px-3 py-1.5 rounded-full transition cursor-pointer"
             >
-              <Lock className="w-3 h-3 text-[#ff6b78]" />
+              <Lock className="w-3 h-3 text-[#ff8690]" />
               <span>Clientes</span>
             </button>
 
             <button
+              type="button"
               onClick={() => setMenuOpen(true)}
               aria-label="Abrir menú"
-              className="flex flex-col items-end justify-center gap-[5px] p-2 -mr-1 rounded-xl hover:bg-white/10 active:scale-95 transition cursor-pointer"
+              className="flex flex-col items-end justify-center gap-[5px] p-2 -mr-1 rounded-xl hover:bg-white/10 transition cursor-pointer"
             >
-              <span className="block w-8 h-[2px] bg-white rounded-full" />
-              <span className="block w-6 h-[2px] bg-white rounded-full" />
-              <span className="block w-4 h-[2px] bg-white rounded-full" />
+              <span className="block w-7 h-[1.5px] bg-white rounded-full" />
+              <span className="block w-5 h-[1.5px] bg-white rounded-full" />
+              <span className="block w-3.5 h-[1.5px] bg-white rounded-full" />
             </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile / Tablet Navigation Drawer */}
+      {/* Mobile / Tablet Drawer */}
       {menuOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end animate-fade-up">
-          <div className="w-full max-w-xs bg-[#181818] text-white h-full p-5 flex flex-col justify-between shadow-2xl overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex justify-end">
+          <div className="w-full max-w-xs bg-[#181818] text-white h-full p-6 flex flex-col justify-between shadow-2xl overflow-y-auto">
             <div>
-              <div className="flex items-center justify-between pb-4 border-b border-white/10">
+              <div className="flex items-center justify-between pb-5 border-b border-white/10">
                 <img src="/logo-patagonia.png" alt={config.company.brandName} className="h-9 w-auto" />
                 <button
+                  type="button"
                   onClick={() => setMenuOpen(false)}
                   aria-label="Cerrar menú"
                   className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition cursor-pointer"
@@ -200,7 +237,7 @@ export default function Navbar() {
                 </button>
               </div>
 
-              <div className="mt-4 space-y-1 text-sm">
+              <div className="mt-5 space-y-1 text-sm">
                 <Link
                   to="/"
                   onClick={() => setMenuOpen(false)}
@@ -209,13 +246,13 @@ export default function Navbar() {
                   Inicio
                 </Link>
 
-                {/* Mobile Services Accordion */}
                 <div>
                   <button
+                    type="button"
                     onClick={() => setMobileServicesOpen((p) => !p)}
                     className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition cursor-pointer"
                   >
-                    <span>Servicios (9)</span>
+                    <span>Servicios</span>
                     <ChevronDown className={`w-4 h-4 transition-transform ${mobileServicesOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {mobileServicesOpen && (
@@ -245,12 +282,13 @@ export default function Navbar() {
                 <Link
                   to="/desratizacion-pre-demolicion-puerto-montt"
                   onClick={() => setMenuOpen(false)}
-                  className="block px-3 py-2.5 rounded-xl bg-[#C41625]/20 border border-[#C41625]/40 text-white font-semibold transition"
+                  className="block px-3 py-2.5 rounded-xl text-[#ff8690] hover:bg-white/10 font-medium transition"
                 >
                   Desratización Pre-Demolición
                 </Link>
 
                 <button
+                  type="button"
                   onClick={() => handleHashNav('trabajos')}
                   className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition cursor-pointer"
                 >
@@ -258,6 +296,7 @@ export default function Navbar() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => handleHashNav('respaldo-sanitario')}
                   className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition cursor-pointer"
                 >
@@ -265,20 +304,23 @@ export default function Navbar() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => handleHashNav('zonas')}
                   className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition cursor-pointer"
                 >
-                  Cobertura Territorial
+                  Cobertura
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => handleHashNav('cotizador')}
                   className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition cursor-pointer"
                 >
-                  Cotizador en Línea
+                  Cotizador
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => handleHashNav('faq')}
                   className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition cursor-pointer"
                 >
@@ -286,16 +328,18 @@ export default function Navbar() {
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => handleHashNav('contacto')}
                   className="w-full text-left px-3 py-2.5 rounded-xl hover:bg-white/10 font-medium transition cursor-pointer"
                 >
                   Contacto
                 </button>
 
-                <div className="pt-3 space-y-2">
+                <div className="pt-4 space-y-2.5">
                   <button
+                    type="button"
                     onClick={handleClientPortal}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-white text-[#141414] text-xs font-bold py-2.5 px-4 rounded-xl transition cursor-pointer"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-white text-[#141414] text-xs font-semibold py-2.5 px-4 rounded-full transition cursor-pointer"
                   >
                     <Lock className="w-3.5 h-3.5 text-[#C41625]" />
                     <span>Acceso Clientes (Central MIP)</span>
@@ -303,17 +347,17 @@ export default function Navbar() {
 
                   <a
                     href={`tel:+${config.company.whatsappNumber}`}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-[#C41625] text-white text-xs font-semibold py-2.5 px-4 rounded-xl transition"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-[#C41625] text-white text-xs font-semibold py-2.5 px-4 rounded-full transition"
                   >
                     <PhoneCall className="w-3.5 h-3.5" />
-                    <span>Llamar: {config.company.whatsappDisplay}</span>
+                    <span>{config.company.whatsappDisplay}</span>
                   </a>
                 </div>
               </div>
             </div>
 
             <div className="pt-4 mt-6 border-t border-white/10 text-[11px] text-neutral-400 space-y-1">
-              <p className="font-semibold text-neutral-200">{config.company.brandName}</p>
+              <p className="font-medium text-neutral-200">{config.company.brandName}</p>
               <p>{config.company.rexSanitaria}</p>
             </div>
           </div>
